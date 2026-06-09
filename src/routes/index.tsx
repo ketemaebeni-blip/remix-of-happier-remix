@@ -1,20 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import SweetBloom from "@/components/sweet-bloom/SweetBloom";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sweet Bloom — Dessert Boutique" },
-      { name: "description", content: "Sweet Bloom — Premium cakes, cookies, shakes & more." },
-      { property: "og:title", content: "Sweet Bloom — Dessert Boutique" },
-      { property: "og:description", content: "Sweet Bloom — Premium cakes, cookies, shakes & more." },
-    ],
-    links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
+      { title: "Selam Cake Shop" },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600;1,700&family=DM+Sans:wght@300;400;500;600&display=swap",
+        name: "description",
+        content:
+          "Selam Cake Shop — Handcrafted cakes, cupcakes & pastries baked fresh daily.",
+      },
+      { property: "og:title", content: "Selam Cake Shop" },
+      {
+        property: "og:description",
+        content:
+          "Selam Cake Shop — Handcrafted cakes, cupcakes & pastries baked fresh daily.",
       },
     ],
   }),
@@ -22,5 +21,17 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  return <SweetBloom />;
+  return (
+    <iframe
+      src="/shop.html"
+      title="Selam Cake Shop"
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        border: "none",
+      }}
+    />
+  );
 }
