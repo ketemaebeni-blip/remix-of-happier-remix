@@ -2466,10 +2466,12 @@
       matches.forEach((p, i) => {
         const qty = cart[p.id] ? cart[p.id].qty : 0;
         productQtys[p.id] = qty;
+        const isOut = !isItemAvailable(p.id);
         const card = document.createElement('article');
-        card.className = 'product-card';
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
         card.style.cssText = `opacity:0;animation:scaleIn 0.3s ease ${i * 0.05}s both;`;
         card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
           <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" />
           <div class="product-card-body">
             <div class="product-card-name">${p.name}</div>
@@ -2482,6 +2484,7 @@
           </div>
         `;
         results.appendChild(card);
+
       });
       lucide.createIcons();
     }
