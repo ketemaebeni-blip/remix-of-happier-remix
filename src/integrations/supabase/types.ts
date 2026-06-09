@@ -128,6 +128,27 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_item_availability: {
+        Row: {
+          available: boolean
+          item_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          available?: boolean
+          item_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          available?: boolean
+          item_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

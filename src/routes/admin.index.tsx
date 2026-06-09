@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import {
   Cake, LayoutGrid, ShoppingBag, UtensilsCrossed, Plus, LogOut, Store,
-  Boxes, CheckCircle2, XCircle, Upload,
+  Boxes, CheckCircle2, XCircle, Upload, Tag,
 } from "lucide-react";
 // @ts-ignore - plain JS data module
 import { CATEGORIES, DISHES } from "@/components/sweet-bloom/data.js";
@@ -17,7 +17,42 @@ export const Route = createFileRoute("/admin/")({
 
 const fmtETB = (n: number) => `ETB ${Number(n).toLocaleString("en-US")}`;
 
-type Section = "overview" | "orders" | "menu";
+type Section = "overview" | "orders" | "menu" | "shop";
+
+// Shop items mirror those hard-coded in public/shop.html
+const SHOP_ITEMS: { id: string; name: string; cat: string; price: number }[] = [
+  { id: "fast1", name: "Fruit & Nut Fasting Cake", cat: "Fasting", price: 35 },
+  { id: "fast2", name: "Vegan Chocolate", cat: "Fasting", price: 38 },
+  { id: "fast3", name: "Apple Cinnamon", cat: "Fasting", price: 32 },
+  { id: "fast4", name: "Carrot Walnut", cat: "Fasting", price: 34 },
+  { id: "ker1", name: "Baptism Cross Cake", cat: "Kerestena", price: 45 },
+  { id: "ker2", name: "Holy Communion Cake", cat: "Kerestena", price: 55 },
+  { id: "ker3", name: "Easter Resurrection Cake", cat: "Kerestena", price: 48 },
+  { id: "ker4", name: "Confirmation Blessing", cat: "Kerestena", price: 42 },
+  { id: "ysh1", name: "Traditional Shemgelena", cat: "Yeshemgelena", price: 40 },
+  { id: "ysh2", name: "Blue Baby Welcome", cat: "Yeshemgelena", price: 38 },
+  { id: "ysh3", name: "Pink Baby Shower", cat: "Yeshemgelena", price: 38 },
+  { id: "ysh4", name: "Neutral Woodland", cat: "Yeshemgelena", price: 42 },
+  { id: "grad1", name: "Cap & Gown Tier", cat: "Graduation", price: 65 },
+  { id: "grad2", name: "Diploma Scroll", cat: "Graduation", price: 50 },
+  { id: "grad3", name: "Class of 2026", cat: "Graduation", price: 58 },
+  { id: "grad4", name: "Scholar Book Stack", cat: "Graduation", price: 55 },
+  { id: "wed1", name: "3-Tier Floral Wedding", cat: "Wedding", price: 220 },
+  { id: "wed2", name: "Anniversary Gold", cat: "Wedding", price: 95 },
+  { id: "wed3", name: "Silver Jubilee", cat: "Wedding", price: 150 },
+  { id: "wed4", name: "Classic Ivory Wedding", cat: "Wedding", price: 120 },
+  { id: "bday1", name: "Chocolate Celebration", cat: "Birthday", price: 38 },
+  { id: "bday2", name: "Vanilla Party Cake", cat: "Birthday", price: 32 },
+  { id: "bday3", name: "Red Velvet Party", cat: "Birthday", price: 42 },
+  { id: "bday4", name: "Custom Theme Cake", cat: "Birthday", price: 55 },
+  { id: "avail1", name: "Classic Vanilla Slice", cat: "Available Today", price: 6 },
+  { id: "avail2", name: "Chocolate Fudge Cupcake", cat: "Available Today", price: 4.5 },
+  { id: "avail3", name: "Strawberry Tart", cat: "Available Today", price: 7 },
+  { id: "avail4", name: "Lemon Drizzle Loaf", cat: "Available Today", price: 5.5 },
+  { id: "avail5", name: "Red Velvet Cookie", cat: "Available Today", price: 3.5 },
+  { id: "avail6", name: "Cinnamon Roll", cat: "Available Today", price: 5 },
+];
+
 
 type OrderRow = {
   id: string;
@@ -45,6 +80,8 @@ function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [shopAvail, setShopAvail] = useState<Record<string, boolean>>({});
+  const [shopBusy, setShopBusy] = useState<Record<string, boolean>>({});
 
   const loadOrders = useCallback(async () => {
     const { data, error } = await supabase
@@ -57,6 +94,30 @@ function AdminDashboard() {
     }
     setOrders((data ?? []) as OrderRow[]);
   }, []);
+
+  const loadShopAvail = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("shop_item_availability")
+      .select("item_id, available");
+    if (error) { console.error("Load shop avail failed", error); return; }
+    const map: Record<string, boolean> = {};
+    (data ?? []).forEach((r: any) => { map[r.item_id] = r.available; });
+    setShopAvail(map);
+  }, []);
+
+  async function toggleShopItem(item_id: string, current: boolean) {
+    setShopBusy((b) => ({ ...b, [item_id]: true }));
+    setShopAvail((m) => ({ ...m, [item_id]: !current })); // optimistic
+    const { error } = await supabase
+      .from("shop_item_availability")
+      .upsert({ item_id, available: !current, updated_at: new Date().toISOString() }, { onConflict: "item_id" });
+    if (error) {
+      alert("Update failed: " + error.message);
+      setShopAvail((m) => ({ ...m, [item_id]: current }));
+    }
+    setShopBusy((b) => ({ ...b, [item_id]: false }));
+  }
+
 
   useEffect(() => {
     (async () => {
@@ -72,13 +133,24 @@ function AdminDashboard() {
       const admin = !!roles?.some((r: any) => r.role === "admin");
       setIsAdmin(admin);
       setReady(true);
-      if (admin) loadOrders();
+      if (admin) { loadOrders(); loadShopAvail(); }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) nav({ to: "/admin/login" });
     });
     return () => sub.subscription.unsubscribe();
-  }, [nav, loadOrders]);
+  }, [nav, loadOrders, loadShopAvail]);
+
+  // Live shop availability
+  useEffect(() => {
+    if (!isAdmin) return;
+    const ch = supabase
+      .channel("shop_avail_admin")
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_item_availability" }, () => loadShopAvail())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [isAdmin, loadShopAvail]);
+
 
   // Live orders
   useEffect(() => {
@@ -184,7 +256,9 @@ function AdminDashboard() {
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "menu", label: "Menu Management", icon: UtensilsCrossed },
+    { id: "shop", label: "Shop Items", icon: Tag },
   ];
+
 
   return (
     <div className="ma-shell">
@@ -423,7 +497,77 @@ function AdminDashboard() {
             </section>
           </>
         )}
+
+        {section === "shop" && (
+          <>
+            <h1 className="ma-page-title">Shop Items</h1>
+            <p className="ma-page-sub">Toggle availability for items shown on the shop page. Changes appear instantly for customers.</p>
+            <section className="ma-card">
+              <div className="ma-card-head">
+                <h2>Inventory ({SHOP_ITEMS.length})</h2>
+                <button className="ma-add-btn" type="button" onClick={loadShopAvail}>Refresh</button>
+              </div>
+              <div className="ma-table-wrap">
+                <table className="ma-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SHOP_ITEMS.map((it) => {
+                      const on = shopAvail[it.id] !== false; // default available
+                      const busy = !!shopBusy[it.id];
+                      return (
+                        <tr key={it.id}>
+                          <td><span className="ma-cake-name">{it.name}</span></td>
+                          <td><span className="ma-cat-tag">{it.cat}</span></td>
+                          <td><span className="ma-price">${it.price}</span></td>
+                          <td>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                fontSize: 11,
+                                fontWeight: 800,
+                                letterSpacing: ".06em",
+                                textTransform: "uppercase",
+                                padding: "4px 10px",
+                                borderRadius: 999,
+                                background: on ? "#dcfce7" : "#fee2e2",
+                                color: on ? "#047857" : "#b91c1c",
+                              }}
+                            >
+                              {on ? "Available" : "Sold Out"}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="ma-stock">
+                              <button
+                                type="button"
+                                className={"ma-switch" + (on ? " on" : "")}
+                                role="switch"
+                                aria-checked={on}
+                                disabled={busy}
+                                aria-label={`Toggle availability for ${it.name}`}
+                                onClick={() => toggleShopItem(it.id, on)}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
       </main>
+
 
       {(editing || creating) && (
         <div className="ma-modal-overlay" onClick={() => !saving && !uploading && (setEditing(null), setCreating(false))}>

@@ -10,6 +10,8 @@
   <meta name="theme-color" content="#FDF6EE" />
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&family=Pacifico&display=swap" rel="stylesheet" />
 
   <!-- ========================================== -->
@@ -310,7 +312,11 @@
       position: relative;
       background: var(--cream);
       box-shadow: 0 0 60px rgba(0, 0, 0, .12);
-      overflow: hidden;
+      overflow: visible;
+    }
+
+    @media (min-width: 768px) {
+      #app { max-width: 520px; }
     }
 
     /* TOPBAR */
@@ -329,19 +335,20 @@
       padding: 0 18px;
     }
 
-    /* BOTTOM NAV */
+    /* BOTTOM NAV — always-visible floating pill */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 480px;
-      z-index: 90;
-      padding: 10px 20px calc(10px + var(--safe-bottom));
+      max-width: 520px;
+      z-index: 150;
+      padding: 10px 16px calc(10px + var(--safe-bottom));
       background: transparent;
       pointer-events: none;
     }
+
 
     .nav-pill-bar {
       display: flex;
@@ -1163,9 +1170,62 @@
     }
 
     .available-card:active { transform: scale(.98); }
+
+    /* STATUS BADGES (Available / Sold Out) */
+    .status-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 4;
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 999px;
+      box-shadow: 0 3px 10px rgba(46, 21, 3, .18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .status-badge.in {
+      background: rgba(220, 252, 231, .95);
+      color: #047857;
+      border: 1px solid rgba(5, 150, 105, .25);
+    }
+    .status-badge.out {
+      background: rgba(254, 226, 226, .95);
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, .25);
+    }
+    .product-card, .product-list-item { position: relative; }
+    .product-card.sold-out .product-card-img,
+    .product-list-item.sold-out .product-list-img {
+      filter: grayscale(.85) brightness(.92);
+      opacity: .75;
+    }
+    .product-card.sold-out .step-btn.plus,
+    .product-list-item.sold-out .step-btn.plus {
+      background: #d6d3d1 !important;
+      cursor: not-allowed !important;
+      pointer-events: none;
+    }
+    .list-status-badge {
+      display: inline-block;
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .list-status-badge.in { background: #dcfce7; color: #047857; }
+    .list-status-badge.out { background: #fee2e2; color: #b91c1c; }
   </style>
   <base target="_blank">
 </head>
+
 
 <body>
 
@@ -1210,10 +1270,11 @@
           <div style="font-size:1rem;font-weight:800;color:var(--choc);line-height:1.1;">Selam Cake</div>
         </div>
       </div>
-      <button onclick="openCart()" aria-label="Open cart" style="width:36px;height:36px;border-radius:12px;background:var(--choc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 10px rgba(46,21,3,.22);transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <i data-lucide="shopping-bag" style="width:16px;height:16px;color:white;stroke-width:2.2;"></i>
-        <span id="topCartBadge" class="nav-pill" style="top:-5px;right:-5px;">0</span>
+      <button onclick="openCart()" aria-label="Open cart" style="width:40px;height:40px;border-radius:12px;background:var(--choc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 10px rgba(46,21,3,.22);transition:opacity .2s;flex-shrink:0;overflow:visible;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <i data-lucide="shopping-bag" style="width:18px;height:18px;color:white;stroke-width:2.2;"></i>
+        <span id="topCartBadge" class="nav-pill" style="top:-6px;right:-6px;border-color:var(--cream);background:#E5533A;">0</span>
       </button>
+
     </header>
 
     <!-- HOME PAGE -->
@@ -1860,11 +1921,101 @@
     let activePage = 'home';
     let prevPage = 'home';
 
+    // Availability map: { item_id: boolean }. Default: assume available until loaded.
+    let availabilityMap = {};
+    let sbClient = null;
+    function isItemAvailable(id) {
+      return availabilityMap[id] !== false; // unknown/true => available
+    }
+
     const allProducts = [];
     Object.entries(categories).forEach(([catKey, cat]) => {
       cat.products.forEach(p => allProducts.push({ ...p, catKey, catTitle: cat.title }));
     });
     availableToday.products.forEach(p => allProducts.push({ ...p, catKey: 'available', catTitle: 'Available Today' }));
+
+    function rerenderActive() {
+      if (activePage === 'detail' && currentCategory) {
+        const cat = categories[currentCategory];
+        if (cat) renderProducts(cat);
+      } else if (activePage === 'available') {
+        // re-open keeps state
+        productQtys = {};
+        availableToday.products.forEach(p => { productQtys[p.id] = cart[p.id] ? cart[p.id].qty : 0; });
+        const grid = document.getElementById('availableGrid');
+        if (grid) {
+          // trigger same render path
+          openAvailableTodayRender();
+        }
+      }
+      // Re-run search if open
+      const si = document.getElementById('searchInput');
+      if (si && document.getElementById('searchSheet').classList.contains('show') && si.value) {
+        handleSearch(si.value);
+      }
+    }
+
+    function openAvailableTodayRender() {
+      const grid = document.getElementById('availableGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      availableToday.products.forEach((p, i) => {
+        const qty = productQtys[p.id] || 0;
+        const isOut = !isItemAvailable(p.id);
+        const card = document.createElement('article');
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
+        card.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', p.name);
+        card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
+          <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" style="height:120px;" />
+          <div class="product-card-body" style="padding-top:110px;">
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-sub">${p.sub}</div>
+            <div class="product-card-rule"></div>
+            <div class="product-card-foot">
+              <div>
+                <span class="cat-from">${isOut ? 'unavailable' : 'ready now'}</span>
+                <span class="product-card-price">$${fmtPrice(p.price)}</span>
+              </div>
+              <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    async function initAvailability() {
+      try {
+        if (!window.supabase) return;
+        const SUPABASE_URL = 'https://gjyhukhtwzhgmrpdifbp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqeWh1a2h0d3poZ21ycGRpZmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDA3NzYsImV4cCI6MjA5NjU3Njc3Nn0.pQupb9pS4w-j72bCagqHSfJqEZy9XpznlAK2rSE0PBo';
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data, error } = await sbClient.from('shop_item_availability').select('item_id, available');
+        if (!error && data) {
+          availabilityMap = {};
+          data.forEach(r => { availabilityMap[r.item_id] = r.available; });
+          rerenderActive();
+        }
+        sbClient
+          .channel('shop_avail_rt')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_item_availability' }, (payload) => {
+            const row = payload.new || payload.old;
+            if (row && row.item_id) {
+              if (payload.eventType === 'DELETE') delete availabilityMap[row.item_id];
+              else availabilityMap[row.item_id] = row.available;
+              rerenderActive();
+            }
+          })
+          .subscribe();
+      } catch (e) { console.warn('availability init failed', e); }
+    }
+
+
 
     function goPage(name) {
       if (activePage === name) return;
@@ -1950,12 +2101,14 @@
       availableToday.products.forEach((p, i) => {
         const qty = productQtys[p.id] || 0;
         const card = document.createElement('article');
-        card.className = 'product-card';
+        const isOut = !isItemAvailable(p.id);
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
         card.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.setAttribute('aria-label', p.name);
         card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
           <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" style="height:120px;" />
           <div class="product-card-body" style="padding-top:110px;">
             <div class="product-card-name">${p.name}</div>
@@ -1963,7 +2116,7 @@
             <div class="product-card-rule"></div>
             <div class="product-card-foot">
               <div>
-                <span class="cat-from">ready now</span>
+                <span class="cat-from">${isOut ? 'unavailable' : 'ready now'}</span>
                 <span class="product-card-price">$${fmtPrice(p.price)}</span>
               </div>
               <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
@@ -1971,6 +2124,7 @@
           </div>
         `;
         grid.appendChild(card);
+
       });
 
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2003,14 +2157,15 @@
       list.innerHTML = '';
       cat.products.forEach((p, i) => {
         const qty = productQtys[p.id] || 0;
+        const isOut = !isItemAvailable(p.id);
         const item = document.createElement('article');
-        item.className = 'product-list-item';
+        item.className = 'product-list-item' + (isOut ? ' sold-out' : '');
         item.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
         item.setAttribute('aria-label', p.name);
         item.innerHTML = `
           <img src="${p.img}" alt="${p.name}" class="product-list-img" loading="lazy" />
           <div class="product-list-info">
-            <div class="product-list-name">${p.name}</div>
+            <div class="product-list-name">${p.name}<span class="list-status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span></div>
             <div class="product-list-sub">${p.sub}</div>
             <div class="product-list-foot">
               <div class="product-list-price">$${fmtPrice(p.price)}</div>
@@ -2020,6 +2175,7 @@
         `;
         list.appendChild(item);
       });
+
       lucide.createIcons();
     }
 
@@ -2045,12 +2201,14 @@
     function addProduct(id) {
       const p = getProduct(id);
       if (!p) return;
+      if (!isItemAvailable(id)) { showToast('Sold out for today'); return; }
       productQtys[id] = 1;
       cart[id] = { product: p, qty: 1 };
       refreshStepper(id);
       updateUI();
       showToast('Added to cart');
     }
+
 
     function increaseProduct(id) {
       if (!cart[id]) return addProduct(id);
@@ -2308,10 +2466,12 @@
       matches.forEach((p, i) => {
         const qty = cart[p.id] ? cart[p.id].qty : 0;
         productQtys[p.id] = qty;
+        const isOut = !isItemAvailable(p.id);
         const card = document.createElement('article');
-        card.className = 'product-card';
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
         card.style.cssText = `opacity:0;animation:scaleIn 0.3s ease ${i * 0.05}s both;`;
         card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
           <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" />
           <div class="product-card-body">
             <div class="product-card-name">${p.name}</div>
@@ -2324,6 +2484,7 @@
           </div>
         `;
         results.appendChild(card);
+
       });
       lucide.createIcons();
     }
@@ -2378,9 +2539,11 @@
     function init() {
       lucide.createIcons();
       updateUI();
+      initAvailability();
       // Hide splash after text animation completes (~3.5s) + buffer
       setTimeout(hideSplash, 3500);
     }
+
   </script>
 </body>
 
