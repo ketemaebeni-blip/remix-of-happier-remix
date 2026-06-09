@@ -2320,7 +2320,7 @@
           <img src="${product.img}" alt="${product.name}" style="width:64px;height:64px;object-fit:cover;border-radius:14px;flex-shrink:0;box-shadow:0 4px 12px rgba(46,21,3,.12);" loading="lazy" />
           <div style="flex:1;min-width:0;">
             <div style="font-size:.88rem;font-weight:700;color:var(--choc);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${product.name}</div>
-            <div style="font-size:.74rem;color:var(--muted);margin-bottom:6px;">${qty} × $${fmtPrice(product.price)}</div>
+            <div style="font-size:.74rem;color:var(--muted);margin-bottom:6px;">${qty} × Birr ${fmtPrice(product.price)}</div>
             <div style="font-size:1rem;font-weight:800;color:var(--choc);">Birr ${(product.price * qty).toFixed(2)}</div>
           </div>
           <button onclick="removeCartItem('${product.id}')" aria-label="Remove ${product.name}" style="width:32px;height:32px;border-radius:50%;background:var(--blush);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;" onmouseover="this.style.background='var(--blush-dark)'" onmouseout="this.style.background='var(--blush)'">
