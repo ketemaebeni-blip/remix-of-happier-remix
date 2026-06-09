@@ -2065,14 +2065,15 @@
       list.innerHTML = '';
       cat.products.forEach((p, i) => {
         const qty = productQtys[p.id] || 0;
+        const isOut = !isItemAvailable(p.id);
         const item = document.createElement('article');
-        item.className = 'product-list-item';
+        item.className = 'product-list-item' + (isOut ? ' sold-out' : '');
         item.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
         item.setAttribute('aria-label', p.name);
         item.innerHTML = `
           <img src="${p.img}" alt="${p.name}" class="product-list-img" loading="lazy" />
           <div class="product-list-info">
-            <div class="product-list-name">${p.name}</div>
+            <div class="product-list-name">${p.name}<span class="list-status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span></div>
             <div class="product-list-sub">${p.sub}</div>
             <div class="product-list-foot">
               <div class="product-list-price">$${fmtPrice(p.price)}</div>
@@ -2082,6 +2083,7 @@
         `;
         list.appendChild(item);
       });
+
       lucide.createIcons();
     }
 
