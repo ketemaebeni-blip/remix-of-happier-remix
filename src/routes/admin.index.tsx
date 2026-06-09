@@ -256,7 +256,9 @@ function AdminDashboard() {
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "menu", label: "Menu Management", icon: UtensilsCrossed },
+    { id: "shop", label: "Shop Items", icon: Tag },
   ];
+
 
   return (
     <div className="ma-shell">
