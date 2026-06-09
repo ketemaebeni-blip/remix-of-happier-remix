@@ -2009,12 +2009,14 @@
       availableToday.products.forEach((p, i) => {
         const qty = productQtys[p.id] || 0;
         const card = document.createElement('article');
-        card.className = 'product-card';
+        const isOut = !isItemAvailable(p.id);
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
         card.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.setAttribute('aria-label', p.name);
         card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
           <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" style="height:120px;" />
           <div class="product-card-body" style="padding-top:110px;">
             <div class="product-card-name">${p.name}</div>
@@ -2022,7 +2024,7 @@
             <div class="product-card-rule"></div>
             <div class="product-card-foot">
               <div>
-                <span class="cat-from">ready now</span>
+                <span class="cat-from">${isOut ? 'unavailable' : 'ready now'}</span>
                 <span class="product-card-price">$${fmtPrice(p.price)}</span>
               </div>
               <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
@@ -2030,6 +2032,7 @@
           </div>
         `;
         grid.appendChild(card);
+
       });
 
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
