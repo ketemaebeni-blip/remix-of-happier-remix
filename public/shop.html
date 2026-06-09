@@ -310,7 +310,11 @@
       position: relative;
       background: var(--cream);
       box-shadow: 0 0 60px rgba(0, 0, 0, .12);
-      overflow: hidden;
+      overflow: visible;
+    }
+
+    @media (min-width: 768px) {
+      #app { max-width: 520px; }
     }
 
     /* TOPBAR */
@@ -329,19 +333,20 @@
       padding: 0 18px;
     }
 
-    /* BOTTOM NAV */
+    /* BOTTOM NAV — always-visible floating pill */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 480px;
-      z-index: 90;
-      padding: 10px 20px calc(10px + var(--safe-bottom));
+      max-width: 520px;
+      z-index: 150;
+      padding: 10px 16px calc(10px + var(--safe-bottom));
       background: transparent;
       pointer-events: none;
     }
+
 
     .nav-pill-bar {
       display: flex;
