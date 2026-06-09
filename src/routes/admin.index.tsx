@@ -1,12 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import {
-  Cake, LayoutGrid, ShoppingBag, UtensilsCrossed, Plus, LogOut, Store,
-  Boxes, CheckCircle2, XCircle, Upload, Tag,
+  Cake, LayoutGrid, ShoppingBag, LogOut, Store,
+  Boxes, CheckCircle2, XCircle, Tag,
 } from "lucide-react";
-// @ts-ignore - plain JS data module
-import { CATEGORIES, DISHES } from "@/components/sweet-bloom/data.js";
-import { useUnavailable, useCakeOverrides } from "@/components/sweet-bloom/availability";
 import { supabase } from "@/integrations/supabase/client";
 import "@/components/sweet-bloom/menu-admin.css";
 
@@ -15,44 +12,45 @@ export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
 });
 
-const fmtETB = (n: number) => `ETB ${Number(n).toLocaleString("en-US")}`;
+const fmtBirr = (n: number) =>
+  `Birr ${Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
-type Section = "overview" | "orders" | "menu" | "shop";
+type Section = "overview" | "orders" | "menu";
 
-// Shop items mirror those hard-coded in public/shop.html
-const SHOP_ITEMS: { id: string; name: string; cat: string; price: number }[] = [
-  { id: "fast1", name: "Fruit & Nut Fasting Cake", cat: "Fasting", price: 35 },
-  { id: "fast2", name: "Vegan Chocolate", cat: "Fasting", price: 38 },
-  { id: "fast3", name: "Apple Cinnamon", cat: "Fasting", price: 32 },
-  { id: "fast4", name: "Carrot Walnut", cat: "Fasting", price: 34 },
-  { id: "ker1", name: "Baptism Cross Cake", cat: "Kerestena", price: 45 },
-  { id: "ker2", name: "Holy Communion Cake", cat: "Kerestena", price: 55 },
-  { id: "ker3", name: "Easter Resurrection Cake", cat: "Kerestena", price: 48 },
-  { id: "ker4", name: "Confirmation Blessing", cat: "Kerestena", price: 42 },
-  { id: "ysh1", name: "Traditional Shemgelena", cat: "Yeshemgelena", price: 40 },
-  { id: "ysh2", name: "Blue Baby Welcome", cat: "Yeshemgelena", price: 38 },
-  { id: "ysh3", name: "Pink Baby Shower", cat: "Yeshemgelena", price: 38 },
-  { id: "ysh4", name: "Neutral Woodland", cat: "Yeshemgelena", price: 42 },
-  { id: "grad1", name: "Cap & Gown Tier", cat: "Graduation", price: 65 },
-  { id: "grad2", name: "Diploma Scroll", cat: "Graduation", price: 50 },
-  { id: "grad3", name: "Class of 2026", cat: "Graduation", price: 58 },
-  { id: "grad4", name: "Scholar Book Stack", cat: "Graduation", price: 55 },
-  { id: "wed1", name: "3-Tier Floral Wedding", cat: "Wedding", price: 220 },
-  { id: "wed2", name: "Anniversary Gold", cat: "Wedding", price: 95 },
-  { id: "wed3", name: "Silver Jubilee", cat: "Wedding", price: 150 },
-  { id: "wed4", name: "Classic Ivory Wedding", cat: "Wedding", price: 120 },
-  { id: "bday1", name: "Chocolate Celebration", cat: "Birthday", price: 38 },
-  { id: "bday2", name: "Vanilla Party Cake", cat: "Birthday", price: 32 },
-  { id: "bday3", name: "Red Velvet Party", cat: "Birthday", price: 42 },
-  { id: "bday4", name: "Custom Theme Cake", cat: "Birthday", price: 55 },
-  { id: "avail1", name: "Classic Vanilla Slice", cat: "Available Today", price: 6 },
-  { id: "avail2", name: "Chocolate Fudge Cupcake", cat: "Available Today", price: 4.5 },
-  { id: "avail3", name: "Strawberry Tart", cat: "Available Today", price: 7 },
-  { id: "avail4", name: "Lemon Drizzle Loaf", cat: "Available Today", price: 5.5 },
-  { id: "avail5", name: "Red Velvet Cookie", cat: "Available Today", price: 3.5 },
-  { id: "avail6", name: "Cinnamon Roll", cat: "Available Today", price: 5 },
+// Shop catalog — mirrors items shown in public/shop.html
+type ShopItem = { id: string; name: string; sub: string; cat: string; price: number; img: string };
+const SHOP_ITEMS: ShopItem[] = [
+  { id: "fast1", name: "Fruit & Nut Fasting Cake", sub: "Mixed dried fruits · Walnuts · Spiced batter · No dairy", cat: "Fasting", price: 35, img: "https://images.pexels.com/photos/37661106/pexels-photo-37661106.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "fast2", name: "Vegan Chocolate", sub: "Rich cocoa · Coconut milk · Dairy-free ganache", cat: "Fasting", price: 38, img: "https://images.pexels.com/photos/37262561/pexels-photo-37262561.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "fast3", name: "Apple Cinnamon", sub: "Fresh apples · Cinnamon spice · Oat crumble topping", cat: "Fasting", price: 32, img: "https://images.pexels.com/photos/30739085/pexels-photo-30739085.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "fast4", name: "Carrot Walnut", sub: "Grated carrots · Walnuts · Orange zest · Plant-based cream", cat: "Fasting", price: 34, img: "https://images.pexels.com/photos/32397279/pexels-photo-32397279.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ker1", name: "Baptism Cross Cake", sub: "White vanilla · Gold cross · Soft buttercream", cat: "Kerestena", price: 45, img: "https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ker2", name: "Holy Communion Cake", sub: "Elegant white · Host detail · Floral accents", cat: "Kerestena", price: 55, img: "https://images.pexels.com/photos/32437628/pexels-photo-32437628.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ker3", name: "Easter Resurrection Cake", sub: "Chocolate layers · Spring florals · Symbolic design", cat: "Kerestena", price: 48, img: "https://images.pexels.com/photos/31336127/pexels-photo-31336127.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ker4", name: "Confirmation Blessing", sub: "Light sponge · Pastel frosting · Dove decoration", cat: "Kerestena", price: 42, img: "https://images.pexels.com/photos/15307373/pexels-photo-15307373.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ysh1", name: "Traditional Shemgelena", sub: "Honey bread base · Decorative icing · Cultural motifs", cat: "Yeshemgelena", price: 40, img: "https://images.pexels.com/photos/29051739/pexels-photo-29051739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ysh2", name: "Blue Baby Welcome", sub: "Vanilla sponge · Blue buttercream · Teddy topper", cat: "Yeshemgelena", price: 38, img: "https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ysh3", name: "Pink Baby Shower", sub: "Strawberry cream · Pink roses · Edible pearls", cat: "Yeshemgelena", price: 38, img: "https://images.pexels.com/photos/12742498/pexels-photo-12742498.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "ysh4", name: "Neutral Woodland", sub: "Earthy tones · Forest animals · Gender-neutral design", cat: "Yeshemgelena", price: 42, img: "https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "grad1", name: "Cap & Gown Tier", sub: "2-tier chocolate · Graduation cap topper · Gold details", cat: "Graduation", price: 65, img: "https://images.pexels.com/photos/9540405/pexels-photo-9540405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "grad2", name: "Diploma Scroll", sub: "Vanilla roll design · Edible ribbon · Personalised name", cat: "Graduation", price: 50, img: "https://images.pexels.com/photos/20768168/pexels-photo-20768168.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "grad3", name: "Class of 2026", sub: "Modern design · School colours · Year banner", cat: "Graduation", price: 58, img: "https://images.pexels.com/photos/12419449/pexels-photo-12419449.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "grad4", name: "Scholar Book Stack", sub: "Stacked book design · Fondant finish · Quote plaque", cat: "Graduation", price: 55, img: "https://images.pexels.com/photos/6210746/pexels-photo-6210746.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "wed1", name: "3-Tier Floral Wedding", sub: "Vanilla sponge · Buttercream roses · Fresh greenery", cat: "Wedding", price: 220, img: "https://images.pexels.com/photos/34569681/pexels-photo-34569681.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "wed2", name: "Anniversary Gold", sub: "Golden fondant · Champagne accents · Sugar flowers", cat: "Wedding", price: 95, img: "https://images.pexels.com/photos/34073612/pexels-photo-34073612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "wed3", name: "Silver Jubilee", sub: "Silver leaf details · White tiers · 25th anniversary", cat: "Wedding", price: 150, img: "https://images.pexels.com/photos/17869890/pexels-photo-17869890.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "wed4", name: "Classic Ivory Wedding", sub: "Single tier · Ivory fondant · Gold leaf details", cat: "Wedding", price: 120, img: "https://images.pexels.com/photos/28378968/pexels-photo-28378968.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "bday1", name: "Chocolate Celebration", sub: "Dark chocolate sponge · Ganache drip · Strawberry topping", cat: "Birthday", price: 38, img: "https://images.pexels.com/photos/2337821/pexels-photo-2337821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "bday2", name: "Vanilla Party Cake", sub: "Classic vanilla · Rainbow sprinkles · Buttercream", cat: "Birthday", price: 32, img: "https://images.pexels.com/photos/32916204/pexels-photo-32916204.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "bday3", name: "Red Velvet Party", sub: "Red velvet layers · Cream cheese · Festive decor", cat: "Birthday", price: 42, img: "https://images.pexels.com/photos/9553739/pexels-photo-9553739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "bday4", name: "Custom Theme Cake", sub: "Your design · Any theme · Personalised message", cat: "Birthday", price: 55, img: "https://images.pexels.com/photos/5713248/pexels-photo-5713248.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail1", name: "Classic Vanilla Slice", sub: "Freshly baked this morning · Light sponge · Buttercream", cat: "Available Today", price: 6, img: "https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail2", name: "Chocolate Fudge Cupcake", sub: "Rich cocoa · Ganache topping · Sprinkles", cat: "Available Today", price: 4.5, img: "https://images.pexels.com/photos/3776947/pexels-photo-3776947.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail3", name: "Strawberry Tart", sub: "Fresh strawberries · Custard · Flaky pastry", cat: "Available Today", price: 7, img: "https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail4", name: "Lemon Drizzle Loaf", sub: "Zesty lemon · Sugar glaze · Moist sponge", cat: "Available Today", price: 5.5, img: "https://images.pexels.com/photos/1485806/pexels-photo-1485806.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail5", name: "Red Velvet Cookie", sub: "Cream cheese chunks · Cocoa · Soft bake", cat: "Available Today", price: 3.5, img: "https://images.pexels.com/photos/2067396/pexels-photo-2067396.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
+  { id: "avail6", name: "Cinnamon Roll", sub: "Warm spice · Cream cheese glaze · Yeast dough", cat: "Available Today", price: 5, img: "https://images.pexels.com/photos/351961/pexels-photo-351961.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
 ];
-
 
 type OrderRow = {
   id: string;
@@ -70,14 +68,6 @@ function AdminDashboard() {
   const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [section, setSection] = useState<Section>("overview");
-  const { isAvailable, setAvailable } = useUnavailable();
-  const { applyOverride, saveOverride } = useCakeOverrides();
-
-  const [editing, setEditing] = useState<any | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: "", category: "", price: "", image_url: "" });
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [shopAvail, setShopAvail] = useState<Record<string, boolean>>({});
@@ -88,10 +78,7 @@ function AdminDashboard() {
       .from("orders")
       .select("id, customer_name, customer_phone, customer_address, items, total, status, created_at")
       .order("created_at", { ascending: false });
-    if (error) {
-      console.error("Load orders failed", error);
-      return;
-    }
+    if (error) { console.error("Load orders failed", error); return; }
     setOrders((data ?? []) as OrderRow[]);
   }, []);
 
@@ -107,7 +94,7 @@ function AdminDashboard() {
 
   async function toggleShopItem(item_id: string, current: boolean) {
     setShopBusy((b) => ({ ...b, [item_id]: true }));
-    setShopAvail((m) => ({ ...m, [item_id]: !current })); // optimistic
+    setShopAvail((m) => ({ ...m, [item_id]: !current }));
     const { error } = await supabase
       .from("shop_item_availability")
       .upsert({ item_id, available: !current, updated_at: new Date().toISOString() }, { onConflict: "item_id" });
@@ -118,18 +105,12 @@ function AdminDashboard() {
     setShopBusy((b) => ({ ...b, [item_id]: false }));
   }
 
-
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        nav({ to: "/admin/login" });
-        return;
-      }
+      if (!session) { nav({ to: "/admin/login" }); return; }
       const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id);
+        .from("user_roles").select("role").eq("user_id", session.user.id);
       const admin = !!roles?.some((r: any) => r.role === "admin");
       setIsAdmin(admin);
       setReady(true);
@@ -141,7 +122,6 @@ function AdminDashboard() {
     return () => sub.subscription.unsubscribe();
   }, [nav, loadOrders, loadShopAvail]);
 
-  // Live shop availability
   useEffect(() => {
     if (!isAdmin) return;
     const ch = supabase
@@ -151,8 +131,6 @@ function AdminDashboard() {
     return () => { supabase.removeChannel(ch); };
   }, [isAdmin, loadShopAvail]);
 
-
-  // Live orders
   useEffect(() => {
     if (!isAdmin) return;
     const channel = supabase
@@ -181,84 +159,22 @@ function AdminDashboard() {
     );
   }
 
-  const editableCats = CATEGORIES.filter((c: any) => c.id !== "all").map((c: any) => c.id);
-  const rows = (DISHES as any[]).map((d: any) => ({ raw: d, merged: applyOverride(d) }));
-
-  // Overview stats
-  const totalCakes = rows.length;
-  const inStock = rows.filter((r) => isAvailable(r.merged.id)).length;
-  const outStock = totalCakes - inStock;
+  const totalItems = SHOP_ITEMS.length;
+  const available = SHOP_ITEMS.filter((i) => shopAvail[i.id] !== false).length;
+  const soldOut = totalItems - available;
   const newOrders = orders.filter((o) => o.status === "new").length;
-
-  function openEdit(raw: any) {
-    const m = applyOverride(raw);
-    setCreating(false);
-    setEditing(raw);
-    setForm({ name: m.nameEN, category: m.cat, price: String(m.price), image_url: m.img });
-  }
-
-  async function uploadImage(file: File) {
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      alert("Image is too large (max 8MB).");
-      return;
-    }
-    setUploading(true);
-    try {
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const path = `cakes/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("cake-images")
-        .upload(path, file, { contentType: file.type, upsert: false });
-      if (upErr) throw upErr;
-      // Private bucket → long-lived signed URL (10 years)
-      const { data, error: urlErr } = await supabase.storage
-        .from("cake-images")
-        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-      if (urlErr || !data?.signedUrl) throw urlErr || new Error("Could not create URL");
-      setForm((f) => ({ ...f, image_url: data.signedUrl }));
-    } catch (err: any) {
-      alert("Upload failed: " + (err?.message ?? "unknown error"));
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  async function submitEdit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editing) return;
-    setSaving(true);
-    try {
-      await saveOverride(editing.id, {
-        name: form.name.trim(),
-        category: form.category,
-        price: Number(form.price),
-        image_url: form.image_url.trim(),
-      });
-      setEditing(null);
-    } catch (err: any) {
-      alert("Save failed: " + (err?.message ?? "unknown error"));
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function setOrderStatus(id: string, status: string) {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (error) {
-      alert("Could not update status: " + error.message);
-      loadOrders();
-    }
+    if (error) { alert("Could not update status: " + error.message); loadOrders(); }
   }
 
   const navItems: { id: Section; label: string; icon: any }[] = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "orders", label: "Orders", icon: ShoppingBag },
-    { id: "menu", label: "Menu Management", icon: UtensilsCrossed },
-    { id: "shop", label: "Shop Items", icon: Tag },
+    { id: "menu", label: "Shop Items", icon: Tag },
   ];
-
 
   return (
     <div className="ma-shell">
@@ -305,18 +221,18 @@ function AdminDashboard() {
             <div className="ma-stats">
               <div className="ma-stat">
                 <span className="ma-stat-icon"><Boxes size={22} /></span>
-                <span className="ma-stat-val">{totalCakes}</span>
-                <span className="ma-stat-label">Total Cakes</span>
+                <span className="ma-stat-val">{totalItems}</span>
+                <span className="ma-stat-label">Total Items</span>
               </div>
               <div className="ma-stat">
                 <span className="ma-stat-icon green"><CheckCircle2 size={22} /></span>
-                <span className="ma-stat-val">{inStock}</span>
-                <span className="ma-stat-label">In Stock</span>
+                <span className="ma-stat-val">{available}</span>
+                <span className="ma-stat-label">Available</span>
               </div>
               <div className="ma-stat">
                 <span className="ma-stat-icon red"><XCircle size={22} /></span>
-                <span className="ma-stat-val">{outStock}</span>
-                <span className="ma-stat-label">Out of Stock</span>
+                <span className="ma-stat-val">{soldOut}</span>
+                <span className="ma-stat-label">Sold Out</span>
               </div>
               <div className="ma-stat">
                 <span className="ma-stat-icon"><ShoppingBag size={22} /></span>
@@ -350,7 +266,7 @@ function AdminDashboard() {
                         <tr key={o.id}>
                           <td><span className="ma-cake-name">{o.customer_name || "—"}</span></td>
                           <td>{o.items.reduce((s, i) => s + i.qty, 0)} item(s)</td>
-                          <td><span className="ma-price">{fmtETB(o.total)}</span></td>
+                          <td><span className="ma-price">{fmtBirr(o.total)}</span></td>
                           <td><span className={"ma-order-status " + o.status}>{o.status}</span></td>
                         </tr>
                       ))}
@@ -398,7 +314,7 @@ function AdminDashboard() {
                               ))}
                             </ul>
                           </td>
-                          <td><span className="ma-price">{fmtETB(o.total)}</span></td>
+                          <td><span className="ma-price">{fmtBirr(o.total)}</span></td>
                           <td style={{ fontSize: 13, color: "#9a8b7c" }}>
                             {new Date(o.created_at).toLocaleString()}
                           </td>
@@ -425,83 +341,8 @@ function AdminDashboard() {
 
         {section === "menu" && (
           <>
-            <h1 className="ma-page-title">Menu Management</h1>
-            <p className="ma-page-sub">Manage your cake catalog, pricing and live stock status.</p>
-
-            <section className="ma-card">
-              <div className="ma-card-head">
-                <h2>Manage Cake Inventory</h2>
-                <button
-                  className="ma-add-btn"
-                  type="button"
-                  onClick={() => {
-                    setCreating(true);
-                    setEditing(null);
-                    setForm({ name: "", category: editableCats[0] ?? "", price: "", image_url: "" });
-                  }}
-                >
-                  <Plus size={18} /> Add New Cake
-                </button>
-              </div>
-
-              <div className="ma-table-wrap">
-                <table className="ma-table">
-                  <thead>
-                    <tr>
-                      <th>Cake</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th>Stock Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map(({ raw, merged }: any) => {
-                      const on = isAvailable(merged.id);
-                      return (
-                        <tr key={merged.id}>
-                          <td>
-                            <div className="ma-cake-cell">
-                              <img className="ma-thumb" src={merged.img} alt={merged.nameEN} loading="lazy" />
-                              <span className="ma-cake-name">{merged.nameEN}</span>
-                            </div>
-                          </td>
-                          <td><span className="ma-cat-tag">{merged.cat}</span></td>
-                          <td><span className="ma-price">{fmtETB(merged.price)}</span></td>
-                          <td>
-                            <div className="ma-stock">
-                              <button
-                                type="button"
-                                className={"ma-switch" + (on ? " on" : "")}
-                                role="switch"
-                                aria-checked={on}
-                                aria-label={`Toggle stock for ${merged.nameEN}`}
-                                onClick={() => setAvailable(merged.id, !on)}
-                              />
-                              <span className={"ma-stock-label " + (on ? "in" : "out")}>
-                                {on ? "In Stock" : "Out of Stock"}
-                              </span>
-                            </div>
-                          </td>
-                          <td>
-                            <button className="ma-edit-btn" type="button" onClick={() => openEdit(raw)}>
-                              Edit
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </>
-        )}
-
-        {section === "shop" && (
-          <>
             <h1 className="ma-page-title">Shop Items</h1>
-            <p className="ma-page-sub">Toggle availability for items shown on the shop page. Changes appear instantly for customers.</p>
+            <p className="ma-page-sub">All items from the shop page. Toggle availability — changes appear instantly for customers.</p>
             <section className="ma-card">
               <div className="ma-card-head">
                 <h2>Inventory ({SHOP_ITEMS.length})</h2>
@@ -520,13 +361,21 @@ function AdminDashboard() {
                   </thead>
                   <tbody>
                     {SHOP_ITEMS.map((it) => {
-                      const on = shopAvail[it.id] !== false; // default available
+                      const on = shopAvail[it.id] !== false;
                       const busy = !!shopBusy[it.id];
                       return (
                         <tr key={it.id}>
-                          <td><span className="ma-cake-name">{it.name}</span></td>
+                          <td>
+                            <div className="ma-cake-cell">
+                              <img className="ma-thumb" src={it.img} alt={it.name} loading="lazy" />
+                              <div>
+                                <div className="ma-cake-name">{it.name}</div>
+                                <div style={{ fontSize: 12, color: "#9a8b7c", maxWidth: 320 }}>{it.sub}</div>
+                              </div>
+                            </div>
+                          </td>
                           <td><span className="ma-cat-tag">{it.cat}</span></td>
-                          <td><span className="ma-price">${it.price}</span></td>
+                          <td><span className="ma-price">{fmtBirr(it.price)}</span></td>
                           <td>
                             <span
                               style={{
@@ -567,74 +416,6 @@ function AdminDashboard() {
           </>
         )}
       </main>
-
-
-      {(editing || creating) && (
-        <div className="ma-modal-overlay" onClick={() => !saving && !uploading && (setEditing(null), setCreating(false))}>
-          <form className="ma-modal" onClick={(e) => e.stopPropagation()} onSubmit={submitEdit}>
-            <h2>{creating ? "Add New Cake" : "Edit Cake"}</h2>
-
-            {creating && (
-              <p style={{ marginTop: -8, marginBottom: 14, fontSize: 13, color: "#9a8b7c" }}>
-                New cakes are added to the catalog file. To edit price, name, category and photo of an
-                existing cake, use the Edit action on each row.
-              </p>
-            )}
-
-            <label className="ma-field">
-              <span>Name</span>
-              <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            </label>
-            <label className="ma-field">
-              <span>Category</span>
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                {editableCats.map((c: string) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </label>
-            <label className="ma-field">
-              <span>Price (ETB)</span>
-              <input required type="number" min="0" step="1" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            </label>
-
-            <div className="ma-field">
-              <span>Photo</span>
-              <label className="ma-upload">
-                <Upload size={16} />
-                {uploading ? "Uploading…" : "Upload a picture"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploading}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) uploadImage(f);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-              <div className="ma-or">…or paste an image URL</div>
-              <input
-                type="url"
-                placeholder="https://…"
-                value={form.image_url}
-                onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-              />
-              {form.image_url && (
-                <img src={form.image_url} alt="preview" style={{ marginTop: 10, width: "100%", maxHeight: 160, objectFit: "cover", borderRadius: 12 }} />
-              )}
-            </div>
-
-            <div className="ma-modal-actions">
-              <button type="button" className="ma-btn-secondary" disabled={saving || uploading} onClick={() => { setEditing(null); setCreating(false); }}>
-                Cancel
-              </button>
-              <button type="submit" className="ma-btn-primary" disabled={saving || uploading || creating}>
-                {saving ? "Saving…" : creating ? "Edit existing rows" : "Save"}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </div>
   );
 }
