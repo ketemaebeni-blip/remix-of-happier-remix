@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import {
   Cake, LayoutGrid, ShoppingBag, UtensilsCrossed, Plus, LogOut, Store,
-  Boxes, CheckCircle2, XCircle, Upload,
+  Boxes, CheckCircle2, XCircle, Upload, Tag,
 } from "lucide-react";
 // @ts-ignore - plain JS data module
 import { CATEGORIES, DISHES } from "@/components/sweet-bloom/data.js";
@@ -17,7 +17,42 @@ export const Route = createFileRoute("/admin/")({
 
 const fmtETB = (n: number) => `ETB ${Number(n).toLocaleString("en-US")}`;
 
-type Section = "overview" | "orders" | "menu";
+type Section = "overview" | "orders" | "menu" | "shop";
+
+// Shop items mirror those hard-coded in public/shop.html
+const SHOP_ITEMS: { id: string; name: string; cat: string; price: number }[] = [
+  { id: "fast1", name: "Fruit & Nut Fasting Cake", cat: "Fasting", price: 35 },
+  { id: "fast2", name: "Vegan Chocolate", cat: "Fasting", price: 38 },
+  { id: "fast3", name: "Apple Cinnamon", cat: "Fasting", price: 32 },
+  { id: "fast4", name: "Carrot Walnut", cat: "Fasting", price: 34 },
+  { id: "ker1", name: "Baptism Cross Cake", cat: "Kerestena", price: 45 },
+  { id: "ker2", name: "Holy Communion Cake", cat: "Kerestena", price: 55 },
+  { id: "ker3", name: "Easter Resurrection Cake", cat: "Kerestena", price: 48 },
+  { id: "ker4", name: "Confirmation Blessing", cat: "Kerestena", price: 42 },
+  { id: "ysh1", name: "Traditional Shemgelena", cat: "Yeshemgelena", price: 40 },
+  { id: "ysh2", name: "Blue Baby Welcome", cat: "Yeshemgelena", price: 38 },
+  { id: "ysh3", name: "Pink Baby Shower", cat: "Yeshemgelena", price: 38 },
+  { id: "ysh4", name: "Neutral Woodland", cat: "Yeshemgelena", price: 42 },
+  { id: "grad1", name: "Cap & Gown Tier", cat: "Graduation", price: 65 },
+  { id: "grad2", name: "Diploma Scroll", cat: "Graduation", price: 50 },
+  { id: "grad3", name: "Class of 2026", cat: "Graduation", price: 58 },
+  { id: "grad4", name: "Scholar Book Stack", cat: "Graduation", price: 55 },
+  { id: "wed1", name: "3-Tier Floral Wedding", cat: "Wedding", price: 220 },
+  { id: "wed2", name: "Anniversary Gold", cat: "Wedding", price: 95 },
+  { id: "wed3", name: "Silver Jubilee", cat: "Wedding", price: 150 },
+  { id: "wed4", name: "Classic Ivory Wedding", cat: "Wedding", price: 120 },
+  { id: "bday1", name: "Chocolate Celebration", cat: "Birthday", price: 38 },
+  { id: "bday2", name: "Vanilla Party Cake", cat: "Birthday", price: 32 },
+  { id: "bday3", name: "Red Velvet Party", cat: "Birthday", price: 42 },
+  { id: "bday4", name: "Custom Theme Cake", cat: "Birthday", price: 55 },
+  { id: "avail1", name: "Classic Vanilla Slice", cat: "Available Today", price: 6 },
+  { id: "avail2", name: "Chocolate Fudge Cupcake", cat: "Available Today", price: 4.5 },
+  { id: "avail3", name: "Strawberry Tart", cat: "Available Today", price: 7 },
+  { id: "avail4", name: "Lemon Drizzle Loaf", cat: "Available Today", price: 5.5 },
+  { id: "avail5", name: "Red Velvet Cookie", cat: "Available Today", price: 3.5 },
+  { id: "avail6", name: "Cinnamon Roll", cat: "Available Today", price: 5 },
+];
+
 
 type OrderRow = {
   id: string;
