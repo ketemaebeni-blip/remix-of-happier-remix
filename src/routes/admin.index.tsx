@@ -80,6 +80,8 @@ function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [shopAvail, setShopAvail] = useState<Record<string, boolean>>({});
+  const [shopBusy, setShopBusy] = useState<Record<string, boolean>>({});
 
   const loadOrders = useCallback(async () => {
     const { data, error } = await supabase
@@ -92,6 +94,30 @@ function AdminDashboard() {
     }
     setOrders((data ?? []) as OrderRow[]);
   }, []);
+
+  const loadShopAvail = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("shop_item_availability")
+      .select("item_id, available");
+    if (error) { console.error("Load shop avail failed", error); return; }
+    const map: Record<string, boolean> = {};
+    (data ?? []).forEach((r: any) => { map[r.item_id] = r.available; });
+    setShopAvail(map);
+  }, []);
+
+  async function toggleShopItem(item_id: string, current: boolean) {
+    setShopBusy((b) => ({ ...b, [item_id]: true }));
+    setShopAvail((m) => ({ ...m, [item_id]: !current })); // optimistic
+    const { error } = await supabase
+      .from("shop_item_availability")
+      .upsert({ item_id, available: !current, updated_at: new Date().toISOString() }, { onConflict: "item_id" });
+    if (error) {
+      alert("Update failed: " + error.message);
+      setShopAvail((m) => ({ ...m, [item_id]: current }));
+    }
+    setShopBusy((b) => ({ ...b, [item_id]: false }));
+  }
+
 
   useEffect(() => {
     (async () => {
