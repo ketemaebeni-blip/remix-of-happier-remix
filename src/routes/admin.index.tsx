@@ -497,7 +497,77 @@ function AdminDashboard() {
             </section>
           </>
         )}
+
+        {section === "shop" && (
+          <>
+            <h1 className="ma-page-title">Shop Items</h1>
+            <p className="ma-page-sub">Toggle availability for items shown on the shop page. Changes appear instantly for customers.</p>
+            <section className="ma-card">
+              <div className="ma-card-head">
+                <h2>Inventory ({SHOP_ITEMS.length})</h2>
+                <button className="ma-add-btn" type="button" onClick={loadShopAvail}>Refresh</button>
+              </div>
+              <div className="ma-table-wrap">
+                <table className="ma-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SHOP_ITEMS.map((it) => {
+                      const on = shopAvail[it.id] !== false; // default available
+                      const busy = !!shopBusy[it.id];
+                      return (
+                        <tr key={it.id}>
+                          <td><span className="ma-cake-name">{it.name}</span></td>
+                          <td><span className="ma-cat-tag">{it.cat}</span></td>
+                          <td><span className="ma-price">${it.price}</span></td>
+                          <td>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                fontSize: 11,
+                                fontWeight: 800,
+                                letterSpacing: ".06em",
+                                textTransform: "uppercase",
+                                padding: "4px 10px",
+                                borderRadius: 999,
+                                background: on ? "#dcfce7" : "#fee2e2",
+                                color: on ? "#047857" : "#b91c1c",
+                              }}
+                            >
+                              {on ? "Available" : "Sold Out"}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="ma-stock">
+                              <button
+                                type="button"
+                                className={"ma-switch" + (on ? " on" : "")}
+                                role="switch"
+                                aria-checked={on}
+                                disabled={busy}
+                                aria-label={`Toggle availability for ${it.name}`}
+                                onClick={() => toggleShopItem(it.id, on)}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
       </main>
+
 
       {(editing || creating) && (
         <div className="ma-modal-overlay" onClick={() => !saving && !uploading && (setEditing(null), setCreating(false))}>
