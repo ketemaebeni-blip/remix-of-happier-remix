@@ -1,0 +1,2281 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Selam Cake Shop</title>
+  <meta name="description" content="Selam Cake Shop — Handcrafted cakes, cupcakes & pastries baked fresh daily." />
+  <meta name="theme-color" content="#FDF6EE" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&family=Pacifico&display=swap" rel="stylesheet" />
+
+  <!-- ========================================== -->
+  <!-- SPLASH SCREEN STYLES                       -->
+  <!-- ========================================== -->
+  <style>
+    /* ── SPLASH SCREEN OVERLAY ── */
+    #splash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #F9D9D3 0%, #FDF6EE 50%, #FAC5A3 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.8s;
+    }
+
+    #splash-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* ── SPLASH CONTAINER ── */
+    .splash-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── LIQUID BLOB CONTAINER ── */
+    .splash-liquid {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── BLOBS ── */
+    .splash-blob {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F5B8C4 0%, #F0A8B8 50%, #E5533A 100%);
+      opacity: 0.75;
+      will-change: transform;
+      filter: blur(8px);
+      -webkit-filter: blur(8px);
+    }
+
+    .splash-blob:nth-child(1) {
+      width: 80px; height: 80px;
+      top: 50%; left: 50%;
+      margin: -40px 0 0 -40px;
+      animation: blob-morph-1 5s ease-in-out infinite;
+    }
+
+    .splash-blob:nth-child(2) {
+      width: 60px; height: 60px;
+      top: 50%; left: 50%;
+      margin: -30px 0 0 -30px;
+      animation: blob-morph-2 5s ease-in-out infinite;
+      animation-delay: -0.5s;
+    }
+
+    .splash-blob:nth-child(3) {
+      width: 50px; height: 50px;
+      top: 50%; left: 50%;
+      margin: -25px 0 0 -25px;
+      animation: blob-morph-3 5s ease-in-out infinite;
+      animation-delay: -1s;
+    }
+
+    .splash-blob:nth-child(4) {
+      width: 70px; height: 70px;
+      top: 50%; left: 50%;
+      margin: -35px 0 0 -35px;
+      animation: blob-morph-4 5s ease-in-out infinite;
+      animation-delay: -1.5s;
+    }
+
+    .splash-blob:nth-child(5) {
+      width: 55px; height: 55px;
+      top: 50%; left: 50%;
+      margin: -27.5px 0 0 -27.5px;
+      animation: blob-morph-5 5s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+
+    .splash-blob:nth-child(6) {
+      width: 65px; height: 65px;
+      top: 50%; left: 50%;
+      margin: -32.5px 0 0 -32.5px;
+      animation: blob-morph-6 5s ease-in-out infinite;
+      animation-delay: -2.5s;
+    }
+
+    .splash-blob:nth-child(7) {
+      width: 45px; height: 45px;
+      top: 50%; left: 50%;
+      margin: -22.5px 0 0 -22.5px;
+      animation: blob-morph-7 5s ease-in-out infinite;
+      animation-delay: -3s;
+    }
+
+    .splash-blob:nth-child(8) {
+      width: 75px; height: 75px;
+      top: 50%; left: 50%;
+      margin: -37.5px 0 0 -37.5px;
+      animation: blob-morph-8 5s ease-in-out infinite;
+      animation-delay: -3.5s;
+    }
+
+    .splash-blob:nth-child(9) {
+      width: 52px; height: 52px;
+      top: 50%; left: 50%;
+      margin: -26px 0 0 -26px;
+      animation: blob-morph-9 5s ease-in-out infinite;
+      animation-delay: -4s;
+    }
+
+    /* ── BLOB ANIMATIONS ── */
+    @keyframes blob-morph-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(60px, -40px) scale(1.2); }
+      50% { transform: translate(-30px, 50px) scale(0.9); }
+      75% { transform: translate(-50px, -30px) scale(1.1); }
+    }
+
+    @keyframes blob-morph-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-50px, 30px) scale(0.8); }
+      50% { transform: translate(40px, -50px) scale(1.3); }
+      75% { transform: translate(30px, 40px) scale(1); }
+    }
+
+    @keyframes blob-morph-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(40px, 50px) scale(1.1); }
+      50% { transform: translate(-60px, -20px) scale(0.85); }
+      75% { transform: translate(20px, -40px) scale(1.2); }
+    }
+
+    @keyframes blob-morph-4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-40px, -50px) scale(0.9); }
+      50% { transform: translate(50px, 30px) scale(1.15); }
+      75% { transform: translate(-20px, 40px) scale(1); }
+    }
+
+    @keyframes blob-morph-5 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.25); }
+      50% { transform: translate(-40px, -40px) scale(0.8); }
+      75% { transform: translate(50px, 20px) scale(1.1); }
+    }
+
+    @keyframes blob-morph-6 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-60px, 20px) scale(0.85); }
+      50% { transform: translate(30px, -30px) scale(1.2); }
+      75% { transform: translate(-30px, -50px) scale(1); }
+    }
+
+    @keyframes blob-morph-7 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, 40px) scale(1.1); }
+      50% { transform: translate(-20px, 50px) scale(0.9); }
+      75% { transform: translate(-40px, -20px) scale(1.15); }
+    }
+
+    @keyframes blob-morph-8 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(-30px, -40px) scale(1.2); }
+      50% { transform: translate(60px, 10px) scale(0.85); }
+      75% { transform: translate(-50px, 30px) scale(1.1); }
+    }
+
+    @keyframes blob-morph-9 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, 50px) scale(0.9); }
+      50% { transform: translate(-50px, -30px) scale(1.2); }
+      75% { transform: translate(40px, -20px) scale(1); }
+    }
+
+    /* ── SPLASH TEXT ── */
+    .splash-text {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .splash-text h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.8rem;
+      color: #2E1503;
+      text-shadow: 0 2px 20px rgba(46, 21, 3, 0.15);
+      margin: 0;
+      animation: text-reveal 5s ease-out forwards;
+    }
+
+    .splash-text p {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6B3A2A;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 8px;
+      opacity: 0;
+      animation: text-fade-in 5s ease-out forwards;
+    }
+
+    @keyframes text-reveal {
+      0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+      20% { opacity: 1; transform: translateY(0) scale(1); }
+      80% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes text-fade-in {
+      0%, 30% { opacity: 0; transform: translateY(10px); }
+      50% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SPLASH EXIT ANIMATION ── */
+    #splash-overlay.exiting {
+      animation: splash-exit 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes splash-exit {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
+
+    /* ── MAIN APP INITIAL STATE ── */
+    #app {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    #app.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
+  <!-- ========================================== -->
+  <!-- YOUR EXISTING APP STYLES                   -->
+  <!-- ========================================== -->
+  <style>
+    :root {
+      --blush: #F9D9D3;
+      --blush-dark: #F0B8AE;
+      --cream: #FDF6EE;
+      --peach: #FAC5A3;
+      --peach-dark: #F5A57A;
+      --choc: #2E1503;
+      --choc-mid: #6B3A2A;
+      --choc-light: #A0522D;
+      --muted: #9A7B72;
+      --white: #FFFFFF;
+      --hero-pink: #F5B8C4;
+      --hero-pink-dark: #EFA0B0;
+      --nav-h: 80px;
+      --top-h: 62px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--cream);
+      color: var(--choc);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--blush-dark); border-radius: 10px; }
+
+    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+      background: var(--cream);
+      box-shadow: 0 0 60px rgba(0, 0, 0, .12);
+      overflow: hidden;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      height: var(--top-h);
+      background: rgba(253, 246, 238, .92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(240, 184, 174, .3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      z-index: 90;
+      padding: 10px 20px calc(10px + var(--safe-bottom));
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .nav-pill-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      background: var(--choc);
+      border-radius: 28px;
+      padding: 10px 16px;
+      box-shadow: 0 8px 32px rgba(46, 21, 3, .28), 0 2px 8px rgba(46, 21, 3, .16);
+      pointer-events: all;
+      height: 64px;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 6px 4px;
+      border-radius: 16px;
+      transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+      position: relative;
+    }
+
+    .nav-item .nav-label {
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: rgba(255, 255, 255, .45);
+      transition: color .2s;
+    }
+
+    .nav-item.active .nav-label { color: rgba(255, 255, 255, .95); }
+
+    .nav-item .nav-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+      background: transparent;
+    }
+
+    .nav-item.active .nav-icon-wrap {
+      background: rgba(255, 255, 255, .15);
+      transform: translateY(-2px);
+    }
+
+    .nav-center-wrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-center-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--peach) 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(249, 180, 150, .5);
+      transition: transform .2s ease, box-shadow .2s ease;
+      position: relative;
+      margin-top: -4px;
+    }
+
+    .nav-center-btn:hover {
+      transform: translateY(-3px) scale(1.06);
+      box-shadow: 0 8px 24px rgba(249, 180, 150, .6);
+    }
+
+    .nav-center-btn:active { transform: scale(.92); }
+
+    .nav-pill {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #E5533A;
+      color: white;
+      border-radius: 999px;
+      min-width: 16px;
+      height: 16px;
+      font-size: .58rem;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      line-height: 1;
+      border: 2px solid var(--choc);
+    }
+
+    .nav-pill.show { display: flex; }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active {
+      display: block;
+      padding-bottom: calc(var(--nav-h) + 24px + var(--safe-bottom));
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-10px) rotate(-3deg); }
+    }
+
+    @keyframes floatB {
+      0%, 100% { transform: translateY(0) rotate(2deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: .6; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .fade-up { animation: fadeUp .5s cubic-bezier(.22, 1, .36, 1) both; }
+    .d1 { animation-delay: .04s; }
+    .d2 { animation-delay: .12s; }
+    .d3 { animation-delay: .20s; }
+    .d4 { animation-delay: .28s; }
+    .d5 { animation-delay: .36s; }
+    .d6 { animation-delay: .44s; }
+
+    /* HERO */
+    .hero-wrap {
+      background: linear-gradient(160deg, #F8C1CC 0%, #F5B4C1 40%, #F0A8B8 100%);
+      position: relative;
+      overflow: hidden;
+      padding: 28px 20px 48px;
+    }
+
+    .hero-search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, .9);
+      border-radius: 999px;
+      padding: 12px 18px;
+      box-shadow: 0 4px 20px rgba(46, 21, 3, .08);
+      cursor: pointer;
+      transition: box-shadow .2s;
+    }
+
+    .hero-search-box:hover { box-shadow: 0 6px 28px rgba(46, 21, 3, .14); }
+
+    .hero-search-text {
+      font-size: .88rem;
+      color: #b09095;
+      font-weight: 500;
+    }
+
+    .hero-cart-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(46, 21, 3, .1);
+      flex-shrink: 0;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .hero-cart-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 22px rgba(46, 21, 3, .16);
+    }
+
+    .hero-deco-blob {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-brand-section {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .hero-bakery-name {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.6rem, 11vw, 3.4rem);
+      color: var(--choc);
+      line-height: 1.1;
+      margin-bottom: 8px;
+      letter-spacing: -.01em;
+    }
+
+    .hero-tagline {
+      font-size: .84rem;
+      color: rgba(46, 21, 3, .6);
+      font-weight: 500;
+      letter-spacing: .02em;
+    }
+
+    .hero-feature-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, .65);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--choc-mid);
+      margin-top: 18px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #E5533A;
+      animation: pulseDot 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    /* DRIP TRANSITION */
+    .hero-drip {
+      display: block;
+      width: 100%;
+      height: 90px;
+      position: relative;
+      z-index: 2;
+      margin-top: -2px;
+      pointer-events: none;
+    }
+
+    /* SECTION */
+    .sec-label {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--choc-mid);
+      margin-bottom: 5px;
+    }
+
+    .sec-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--choc);
+      line-height: 1.2;
+    }
+
+    .chip-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .chip {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1.5px solid rgba(240, 184, 174, .5);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--choc-mid);
+      box-shadow: 0 2px 8px rgba(46, 21, 3, .05);
+      cursor: default;
+    }
+
+    /* PRODUCT CARDS */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px 14px;
+      padding-top: 8px;
+    }
+
+    .product-card {
+      background: var(--white);
+      border-radius: 24px;
+      position: relative;
+      overflow: visible;
+      box-shadow: 0 4px 20px rgba(46, 21, 3, .09);
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1), box-shadow .28s ease;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(46, 21, 3, .15);
+    }
+
+    .product-card:active { transform: scale(.97); }
+
+    .product-card-img {
+      width: calc(100% - 60px);
+      height: 139px;
+      object-fit: cover;
+      border-radius: 20px;
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      pointer-events: none;
+      background-size: cover;
+    }
+
+    .product-card-body {
+      padding: 116px 16px 16px;
+      text-align: left;
+    }
+
+    .product-card-name {
+      font-size: .88rem;
+      font-weight: 800;
+      color: var(--choc);
+      line-height: 1.25;
+      margin-bottom: 5px;
+    }
+
+    .product-card-sub {
+      font-size: .66rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-card-rule {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blush), transparent);
+      margin-bottom: 12px;
+    }
+
+    .product-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    .product-card-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--choc);
+    }
+
+    .cat-from {
+      font-size: .66rem;
+      color: var(--muted);
+      font-weight: 500;
+      display: block;
+    }
+
+    /* PRODUCT LIST */
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .product-list-item {
+      background: var(--white);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(46, 21, 3, .09);
+      transition: transform .28s cubic-bezier(.22, 1, .36, 1), box-shadow .28s ease;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-list-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 10px 32px rgba(46, 21, 3, .14);
+    }
+
+    .product-list-item:active { transform: scale(.98); }
+
+    .product-list-img {
+      width: 88px;
+      height: 88px;
+      object-fit: cover;
+      border-radius: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 6px 18px rgba(46, 21, 3, .18);
+    }
+
+    .product-list-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .product-list-name {
+      font-size: .92rem;
+      font-weight: 800;
+      color: var(--choc);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .product-list-sub {
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-list-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .product-list-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--choc);
+    }
+
+    /* DETAIL PAGE */
+    .detail-hero-wrap { position: relative; }
+    .detail-hero-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .detail-hero-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(46, 21, 3, .08) 0%, rgba(46, 21, 3, .72) 100%);
+    }
+
+    .detail-hero-text {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 22px 18px 18px;
+    }
+
+    .detail-float-img {
+      position: absolute;
+      right: 18px;
+      bottom: -38px;
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid var(--white);
+      box-shadow: 0 10px 30px rgba(46, 21, 3, .2);
+      animation: floatB 5s ease-in-out infinite;
+      z-index: 20;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 30;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .9);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(46, 21, 3, .12);
+      transition: transform .2s, background .2s;
+    }
+
+    .back-btn:hover {
+      background: white;
+      transform: translateX(-2px);
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .step-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: transform .15s ease, opacity .15s;
+    }
+
+    .step-btn:active { transform: scale(.84); }
+
+    .step-btn.minus {
+      background: var(--blush);
+      color: var(--choc);
+    }
+
+    .step-btn.plus {
+      background: var(--choc);
+      color: white;
+    }
+
+    .step-btn.minus:hover { background: var(--blush-dark); }
+    .step-btn.plus:hover { opacity: .85; }
+
+    .step-count {
+      min-width: 20px;
+      text-align: center;
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--choc);
+    }
+
+    /* CART SHEET */
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(46, 21, 3, .45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sheet-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .sheet-panel {
+      background: var(--cream);
+      border-radius: 28px 28px 0 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 0;
+      transform: translateY(100%);
+      transition: transform .4s cubic-bezier(.22, 1, .36, 1);
+      max-height: 82dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 -10px 40px rgba(46, 21, 3, .2);
+    }
+
+    .sheet-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-footer {
+      padding: 16px 20px calc(20px + var(--safe-bottom));
+      background: var(--cream);
+      border-top: 1px solid rgba(240, 184, 174, .35);
+      flex-shrink: 0;
+    }
+
+    .sheet-overlay.show .sheet-panel { transform: translateY(0); }
+
+    .sheet-handle-wrap {
+      padding: 12px 0 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sheet-handle {
+      width: 38px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--blush-dark);
+    }
+
+    .sheet-head {
+      padding: 16px 20px 0;
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 12px rgba(46, 21, 3, .07);
+      border: 1.5px solid transparent;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .search-input-wrap:focus-within {
+      border-color: var(--blush-dark);
+      box-shadow: 0 4px 20px rgba(46, 21, 3, .1);
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--choc);
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--nav-h) + 80px + var(--safe-bottom));
+      left: 50%;
+      z-index: 300;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--choc);
+      color: white;
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      white-space: nowrap;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background: var(--blush);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    /* ABOUT */
+    .about-hero {
+      background: linear-gradient(145deg, var(--choc) 0%, #5A2D18 100%);
+      border-radius: 24px;
+      padding: 28px 22px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .about-hero-deco {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .about-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .about-stat-card {
+      background: var(--white);
+      border-radius: 18px;
+      padding: 16px 10px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(46, 21, 3, .07);
+    }
+
+    .about-value-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(46, 21, 3, .06);
+    }
+
+    .about-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .about-team-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 6px 24px rgba(46, 21, 3, .12);
+    }
+
+    .about-contact-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 10px rgba(46, 21, 3, .06);
+    }
+
+    .about-contact-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* AVAILABLE TODAY CARD */
+    .available-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 20px 22px;
+      box-shadow: 0 8px 28px rgba(46, 21, 3, .12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform .25s cubic-bezier(.22, 1, .36, 1), box-shadow .25s ease;
+      border: 1.5px solid rgba(240, 184, 174, .4);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .available-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 36px rgba(46, 21, 3, .16);
+    }
+
+    .available-card:active { transform: scale(.98); }
+  </style>
+  <base target="_blank">
+</head>
+
+<body>
+
+  <!-- ========================================== -->
+  <!-- SPLASH SCREEN OVERLAY                      -->
+  <!-- ========================================== -->
+  <div id="splash-overlay" aria-hidden="true">
+    <div class="splash-container">
+      <!-- Animated blob container -->
+      <div class="splash-liquid">
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+        <div class="splash-blob"></div>
+      </div>
+      <!-- Center text -->
+      <div class="splash-text">
+        <h1>Selam Cake</h1>
+        <p>Handcrafted with Love</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MAIN APP                                   -->
+  <!-- ========================================== -->
+  <div id="app">
+
+    <!-- TOP BAR -->
+    <header class="topbar" id="mainTopbar" role="banner" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--blush),var(--peach));border-radius:12px;display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="cake" style="width:18px;height:18px;color:var(--choc-mid);stroke-width:2.2;"></i>
+        </div>
+        <div>
+          <div style="font-size:.62rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Artisan Bakery</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--choc);line-height:1.1;">Selam Cake</div>
+        </div>
+      </div>
+      <button onclick="openCart()" aria-label="Open cart" style="width:36px;height:36px;border-radius:12px;background:var(--choc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 10px rgba(46,21,3,.22);transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <i data-lucide="shopping-bag" style="width:16px;height:16px;color:white;stroke-width:2.2;"></i>
+        <span id="topCartBadge" class="nav-pill" style="top:-5px;right:-5px;">0</span>
+      </button>
+    </header>
+
+    <!-- HOME PAGE -->
+    <main id="page-home" class="page active" role="main">
+      <section class="hero-wrap" aria-labelledby="heroHeading">
+        <div class="hero-deco-blob" style="width:220px;height:220px;background:rgba(255,255,255,.18);top:-80px;right:-60px;filter:blur(50px);"></div>
+        <div class="hero-deco-blob" style="width:140px;height:140px;background:rgba(255,255,255,.12);bottom:-20px;left:-30px;filter:blur(40px);"></div>
+
+        <div class="hero-search-row fade-up d1">
+          <div class="hero-search-box" onclick="openSearchSheet()" role="button" tabindex="0" aria-label="Search cakes">
+            <i data-lucide="search" style="width:16px;height:16px;color:#b09095;stroke-width:2.2;flex-shrink:0;"></i>
+            <span class="hero-search-text">Search cakes, cupcakes...</span>
+          </div>
+          <button class="hero-cart-btn" onclick="openCart()" aria-label="Open cart">
+            <i data-lucide="shopping-cart" style="width:18px;height:18px;color:var(--choc-mid);stroke-width:2.2;"></i>
+            <span id="heroCartBadge" class="nav-pill">0</span>
+          </button>
+        </div>
+
+        <div class="hero-brand-section fade-up d2">
+          <h1 id="heroHeading" class="hero-bakery-name">Selam Cake Shop</h1>
+          <p class="hero-tagline">Handcrafted daily with love &amp; the finest ingredients</p>
+          <div class="hero-feature-pill fade-up d3">
+            <span class="live-dot"></span>
+            Fresh baked today · 24 items available
+          </div>
+        </div>
+      </section>
+
+      <svg class="hero-drip" viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C60,18 120,42 180,28 C240,14 300,52 360,38 C420,24 480,56 540,42 C600,28 660,58 720,44 C780,30 840,54 900,40 C960,26 1020,50 1080,36 C1140,22 1200,48 1260,34 C1320,20 1380,42 1440,28 L1440,100 L0,100 Z" fill="#F0A8B8" />
+      </svg>
+
+      <section style="padding:0 18px;margin-top:-14px;position:relative;z-index:10;">
+        <div class="available-card fade-up d2" onclick="openAvailableToday()" role="button" tabindex="0" aria-label="View items available today">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--blush),var(--peach));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(249,180,150,.35);">
+              <i data-lucide="store" style="width:22px;height:22px;color:var(--choc-mid);stroke-width:2;"></i>
+            </div>
+            <div>
+              <div style="font-size:1.05rem;font-weight:800;color:var(--choc);line-height:1.2;">Available for Today</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:3px;">Fresh bakes ready to take home</div>
+            </div>
+          </div>
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--blush);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i data-lucide="arrow-right" style="width:16px;height:16px;color:var(--choc-mid);stroke-width:2.5;"></i>
+          </div>
+        </div>
+      </section>
+
+      <section id="menuSection" style="padding:32px 18px 8px;" aria-labelledby="menuHeading">
+        <div style="margin-bottom:20px;" class="fade-up">
+          <div class="sec-label" style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="sun" style="width:11px;height:11px;color:var(--choc-mid);stroke-width:2.5;"></i>
+            What's Fresh
+          </div>
+          <h2 id="menuHeading" class="sec-title">Today's Menu</h2>
+        </div>
+
+        <div class="card-grid" style="margin-bottom:14px;">
+          <div class="product-card fade-up d1" onclick="openCategory('fasting')" role="button" tabindex="0" aria-label="Fasting Cakes">
+            <img src="tsom-removebg-preview.png" alt="Fasting cakes" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Fasting<br>Cakes</div>
+              <div class="product-card-sub">የፆም ኬኮች · Plant-based & delicious</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$32</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card fade-up d2" onclick="openCategory('kerestena')" role="button" tabindex="0" aria-label="Kerestena Cakes">
+            <img src="kirestena-removebg-preview.png" alt="Kerestena cake" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Kerestena<br>Cake</div>
+              <div class="product-card-sub">የክርስትና ኬክ · Baptisms & communion</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$42</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-grid" style="margin-bottom:14px;">
+          <div class="product-card fade-up d3" onclick="openCategory('yeshemgelena')" role="button" tabindex="0" aria-label="Yeshemgelena Cakes">
+            <img src="shemglena-removebg-preview.png" alt="Yeshemgelena cakes" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Yeshemgelena<br>Cake</div>
+              <div class="product-card-sub">የሽምግልና ኬክ · Baby showers & welcomes</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$38</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:#F3F0FF;display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:#6B3AED;stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card fade-up d4" onclick="openCategory('graduation')" role="button" tabindex="0" aria-label="Graduation Cakes">
+            <img src="graduation-removebg-preview.png" alt="Graduation cakes" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Graduation<br>Cakes</div>
+              <div class="product-card-sub">የምረቃት ኬክ · Celebrate achievements</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$50</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:#FFFBEB;display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:#D97706;stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="product-card fade-up d5" onclick="openCategory('wedding')" role="button" tabindex="0" aria-label="Wedding and Anniversary Cakes">
+            <img src="wedding-removebg-preview.png" alt="Wedding cakes" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Wedding &amp;<br>Anniversary</div>
+              <div class="product-card-sub">Timeless elegance for your big day</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$95</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:#ECFDF5;display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:#059669;stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card fade-up d6" onclick="openCategory('birthday')" role="button" tabindex="0" aria-label="Birthday and Celebration Cakes">
+            <img src="birthday-removebg-preview.png" alt="Birthday cakes" class="product-card-img" loading="lazy" />
+            <div class="product-card-body">
+              <div class="product-card-name">Birthday &amp;<br>Celebration</div>
+              <div class="product-card-sub">For every special occasion</div>
+              <div class="product-card-rule"></div>
+              <div class="product-card-foot">
+                <div>
+                  <span class="cat-from">from</span>
+                  <span class="product-card-price">$32</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:#FFF0F3;display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="arrow-right" style="width:12px;height:12px;color:#E11D48;stroke-width:2.5;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ABOUT US PAGE -->
+    <div id="page-about" class="page" role="main" aria-label="About Us">
+      <div style="padding:20px 18px;">
+        <div style="margin-bottom:20px;">
+          <div class="sec-label" style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="heart" style="width:11px;height:11px;color:var(--choc-mid);stroke-width:2.5;"></i>
+            Our Story
+          </div>
+          <h2 class="sec-title">About Us</h2>
+        </div>
+        <div class="about-hero">
+          <div class="about-hero-deco" style="width:160px;height:160px;background:rgba(255,255,255,.05);top:-50px;right:-50px;"></div>
+          <div class="about-hero-deco" style="width:80px;height:80px;background:rgba(255,255,255,.04);bottom:-20px;left:20px;"></div>
+          <div style="position:relative;z-index:2;">
+            <div style="width:52px;height:52px;background:rgba(255,255,255,.12);border-radius:17px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+              <i data-lucide="cake" style="width:24px;height:24px;color:white;stroke-width:1.8;"></i>
+            </div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:white;line-height:1.2;margin-bottom:12px;">
+              Baked with love<br><em style="color:var(--peach);">since 2015</em>
+            </div>
+            <p style="font-size:.8rem;color:rgba(255,255,255,.7);line-height:1.7;">Selam Cake Shop was born from a simple belief — that every celebration deserves something truly special. What started as a home kitchen in Addis Ababa has grown into one of the city's most beloved artisan bakeries.</p>
+          </div>
+        </div>
+        <div class="about-stat-grid">
+          <div class="about-stat-card">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--choc);">9+</div>
+            <div style="font-size:.65rem;color:var(--muted);font-weight:500;margin-top:3px;">Years Baking</div>
+          </div>
+          <div class="about-stat-card">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--choc);">15k+</div>
+            <div style="font-size:.65rem;color:var(--muted);font-weight:500;margin-top:3px;">Happy Customers</div>
+          </div>
+          <div class="about-stat-card">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--choc);">50+</div>
+            <div style="font-size:.65rem;color:var(--muted);font-weight:500;margin-top:3px;">Cake Designs</div>
+          </div>
+        </div>
+        <div style="margin-bottom:20px;position:relative;">
+          <img src="https://images.pexels.com/photos/3738088/pexels-photo-3738088.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Our baking team" class="about-team-img" loading="lazy" />
+          <div style="position:absolute;bottom:14px;left:14px;background:rgba(46,21,3,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:8px 14px;">
+            <div style="font-size:.75rem;font-weight:700;color:white;">Our Baking Team</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.6);">Crafting joy every morning</div>
+          </div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:.76rem;font-weight:700;color:var(--choc);margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+            <i data-lucide="sparkles" style="width:13px;height:13px;color:var(--choc-mid);stroke-width:2.2;"></i>
+            What We Stand For
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="about-value-card">
+              <div class="about-icon-box" style="background:#FFF0EB;">
+                <i data-lucide="leaf" style="width:18px;height:18px;color:#A0522D;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.88rem;font-weight:700;color:var(--choc);margin-bottom:3px;">Natural Ingredients</div>
+                <div style="font-size:.74rem;color:var(--muted);line-height:1.5;">We source only the freshest, highest-quality ingredients — no artificial flavours, ever.</div>
+              </div>
+            </div>
+            <div class="about-value-card">
+              <div class="about-icon-box" style="background:#ECFDF5;">
+                <i data-lucide="pencil-ruler" style="width:18px;height:18px;color:#059669;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.88rem;font-weight:700;color:var(--choc);margin-bottom:3px;">Handcrafted with Care</div>
+                <div style="font-size:.74rem;color:var(--muted);line-height:1.5;">Every cake is made by hand, with meticulous attention to detail and artistry.</div>
+              </div>
+            </div>
+            <div class="about-value-card">
+              <div class="about-icon-box" style="background:#F3F0FF;">
+                <i data-lucide="heart" style="width:18px;height:18px;color:#6B3AED;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.88rem;font-weight:700;color:var(--choc);margin-bottom:3px;">Made for Moments</div>
+                <div style="font-size:.74rem;color:var(--muted);line-height:1.5;">We believe food is love made visible. Every order is a celebration we're honoured to be part of.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="font-size:.76rem;font-weight:700;color:var(--choc);margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+            <i data-lucide="map-pin" style="width:13px;height:13px;color:var(--choc-mid);stroke-width:2.2;"></i>
+            Find Us
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="about-contact-row">
+              <div class="about-contact-icon" style="background:#FFF0EB;">
+                <i data-lucide="map-pin" style="width:16px;height:16px;color:#A0522D;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.84rem;font-weight:700;color:var(--choc);">123 Blossom Lane, Sweet District</div>
+                <div style="font-size:.72rem;color:var(--muted);">Addis Ababa, Ethiopia</div>
+              </div>
+            </div>
+            <div class="about-contact-row">
+              <div class="about-contact-icon" style="background:#ECFDF5;">
+                <i data-lucide="clock" style="width:16px;height:16px;color:#059669;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.84rem;font-weight:700;color:var(--choc);">Mon–Fri 7am–8pm</div>
+                <div style="font-size:.72rem;color:var(--muted);">Sat–Sun 8am–9pm</div>
+              </div>
+            </div>
+            <div class="about-contact-row">
+              <div class="about-contact-icon" style="background:#FFFBEB;">
+                <i data-lucide="phone" style="width:16px;height:16px;color:#D97706;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.84rem;font-weight:700;color:var(--choc);">+1 (555) 234-5678</div>
+                <div style="font-size:.72rem;color:var(--muted);">Call or WhatsApp us</div>
+              </div>
+            </div>
+            <div class="about-contact-row">
+              <div class="about-contact-icon" style="background:#FFF0F3;">
+                <i data-lucide="instagram" style="width:16px;height:16px;color:#E11D48;stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.84rem;font-weight:700;color:var(--choc);">@selamcakeshop</div>
+                <div style="font-size:.72rem;color:var(--muted);">Follow us for daily bakes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;padding:24px 0 4px;color:var(--muted);font-size:.68rem;">
+          Selam Cake Shop · Made with love in Addis Ababa
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL PAGE -->
+    <div id="page-detail" class="page" role="main" aria-label="Product category">
+      <div class="detail-hero-wrap">
+        <img id="detailHeroBg" src="" alt="" class="detail-hero-img" />
+        <div class="detail-hero-grad"></div>
+        <button class="back-btn" onclick="closeDetail()" aria-label="Back">
+          <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--choc);stroke-width:2.5;"></i>
+        </button>
+        <div class="detail-hero-text">
+          <span id="detailBadge" style="background:rgba(255,255,255,.18);color:white;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 12px;border-radius:999px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"></span>
+          <h2 id="detailTitle" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:white;line-height:1.15;max-width:180px;"></h2>
+          <p id="detailSub" style="font-size:.76rem;color:rgba(255,255,255,.65);margin-top:5px;"></p>
+        </div>
+        <img id="detailHeroFloat" src="" alt="" class="detail-float-img" />
+      </div>
+      <div style="padding:52px 18px 16px;">
+        <div style="margin-bottom:16px;">
+          <div class="sec-label" style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="layers" style="width:11px;height:11px;color:var(--choc-mid);stroke-width:2.5;"></i>
+            Choose Your Design
+          </div>
+          <h3 id="detailSubtitle" style="font-size:1.1rem;font-weight:800;color:var(--choc);"></h3>
+        </div>
+        <div id="productList"></div>
+      </div>
+    </div>
+
+    <!-- AVAILABLE TODAY PAGE -->
+    <div id="page-available" class="page" role="main" aria-label="Available Today">
+      <div class="detail-hero-wrap" style="background: linear-gradient(145deg, #F8C1CC 0%, #F5B4C1 60%, #F0A8B8 100%); height: 220px;">
+        <div class="detail-hero-grad" style="background: linear-gradient(to bottom, rgba(46,21,3,.05) 0%, rgba(46,21,3,.55) 100%);"></div>
+        <button class="back-btn" onclick="closeAvailable()" aria-label="Back">
+          <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--choc);stroke-width:2.5;"></i>
+        </button>
+        <div class="detail-hero-text">
+          <span style="background:rgba(255,255,255,.18);color:white;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 12px;border-radius:999px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">Fresh from Oven</span>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:white;line-height:1.15;max-width:220px;">Available for Today</h2>
+          <p style="font-size:.76rem;color:rgba(255,255,255,.65);margin-top:5px;">Ready-made cakes & pastries on display</p>
+        </div>
+      </div>
+      <div style="padding:32px 18px 16px;">
+        <div style="margin-bottom:16px;">
+          <div class="sec-label" style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="store" style="width:11px;height:11px;color:var(--choc-mid);stroke-width:2.5;"></i>
+            In Store Now
+          </div>
+          <h3 style="font-size:1.1rem;font-weight:800;color:var(--choc);">Grab & Go</h3>
+        </div>
+        <div id="availableGrid" class="card-grid"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-pill-bar">
+        <button class="nav-item active" id="nav-home" onclick="goPage('home')" aria-label="Home" aria-current="page">
+          <div class="nav-icon-wrap">
+            <i data-lucide="home" style="width:19px;height:19px;color:rgba(255,255,255,.9);stroke-width:2.2;"></i>
+          </div>
+          <span class="nav-label">Home</span>
+        </button>
+
+        <div class="nav-center-wrap">
+          <button class="nav-center-btn" onclick="openCart()" aria-label="View cart">
+            <i data-lucide="shopping-bag" style="width:21px;height:21px;color:var(--choc);stroke-width:2.2;"></i>
+            <span id="navCartBadge" class="nav-pill">0</span>
+          </button>
+          <div id="navTotal"
+            style="position:absolute;bottom:58px;left:50%;transform:translateX(-50%);background:var(--choc);color:white;padding:4px 12px;border-radius:999px;font-size:.65rem;font-weight:700;white-space:nowrap;opacity:0;transition:opacity .3s ease;pointer-events:none;box-shadow:0 4px 12px rgba(46,21,3,.2);">
+          </div>
+        </div>
+
+        <button class="nav-item" id="nav-about" onclick="goPage('about')" aria-label="About Us">
+          <div class="nav-icon-wrap">
+            <i data-lucide="info" style="width:19px;height:19px;color:rgba(255,255,255,.45);stroke-width:2.2;"></i>
+          </div>
+          <span class="nav-label">About</span>
+        </button>
+
+      </div>
+    </nav>
+
+    <!-- CART SHEET -->
+    <div class="sheet-overlay" id="cartSheet" role="dialog" aria-modal="true" aria-label="Shopping cart"
+      onclick="handleSheetClick(event)">
+      <div class="sheet-panel" onclick="event.stopPropagation()">
+        <div class="sheet-handle-wrap">
+          <div class="sheet-handle"></div>
+        </div>
+        <div class="sheet-head">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <h2 style="font-size:1.2rem;font-weight:800;color:var(--choc);">Your Cart</h2>
+            <button onclick="closeCart()" aria-label="Close cart"
+              style="width:32px;height:32px;border-radius:50%;background:var(--blush);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;"
+              onmouseover="this.style.background='var(--blush-dark)'" onmouseout="this.style.background='var(--blush)'">
+              <i data-lucide="x" style="width:14px;height:14px;color:var(--choc);stroke-width:2.5;"></i>
+            </button>
+          </div>
+          <p style="font-size:.76rem;color:var(--muted);">Review before placing your order</p>
+        </div>
+        <div class="sheet-scroll">
+          <div id="cartContent"></div>
+          <div id="cartEmpty" style="text-align:center;padding:40px 20px;display:none;">
+            <div class="empty-icon-wrap">
+              <i data-lucide="shopping-cart" style="width:30px;height:30px;color:var(--choc-mid);stroke-width:1.8;"></i>
+            </div>
+            <div style="font-weight:700;color:var(--choc);margin-bottom:6px;">Your cart is empty</div>
+            <div style="font-size:.8rem;color:var(--muted);">Browse our menu and add something delicious!</div>
+          </div>
+        </div>
+        <div id="cartFooter" class="sheet-footer" style="display:none;">
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--white);border-radius:14px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div
+                style="width:34px;height:34px;border-radius:10px;background:var(--blush);display:flex;align-items:center;justify-content:center;">
+                <i data-lucide="truck" style="width:15px;height:15px;color:var(--choc-mid);stroke-width:2;"></i>
+              </div>
+              <div>
+                <div style="font-size:.82rem;font-weight:700;color:var(--choc);">Free Delivery</div>
+                <div style="font-size:.68rem;color:var(--muted);">Est. 45–60 min</div>
+              </div>
+            </div>
+            <i data-lucide="check-circle" style="width:18px;height:18px;color:#059669;stroke-width:2;fill:none;"></i>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 2px;">
+            <span style="font-size:.84rem;font-weight:600;color:var(--muted);">Subtotal</span>
+            <span id="cartSubtotal" style="font-size:.9rem;font-weight:700;color:var(--choc);">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 2px;">
+            <span style="font-size:.92rem;font-weight:700;color:var(--choc);">Total</span>
+            <span id="cartTotalAmount" style="font-size:1.25rem;font-weight:800;color:var(--choc);">$0.00</span>
+          </div>
+          <button onclick="checkout()"
+            style="width:100%;background:linear-gradient(135deg,var(--choc),var(--choc-mid));color:white;border:none;cursor:pointer;border-radius:18px;padding:16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.92rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 18px rgba(46,21,3,.28);transition:transform .2s,box-shadow .2s;"
+            onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+            <i data-lucide="credit-card" style="width:16px;height:16px;stroke-width:2.2;"></i>
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH SHEET (replaces search page) -->
+    <div class="sheet-overlay" id="searchSheet" role="dialog" aria-modal="true" aria-label="Search"
+      onclick="handleSearchSheetClick(event)">
+      <div class="sheet-panel" onclick="event.stopPropagation()" style="max-height:85dvh;">
+        <div class="sheet-handle-wrap">
+          <div class="sheet-handle"></div>
+        </div>
+        <div class="sheet-head">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h2 style="font-size:1.2rem;font-weight:800;color:var(--choc);">Find Your Cake</h2>
+            <button onclick="closeSearchSheet()" aria-label="Close search"
+              style="width:32px;height:32px;border-radius:50%;background:var(--blush);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;"
+              onmouseover="this.style.background='var(--blush-dark)'" onmouseout="this.style.background='var(--blush)'">
+              <i data-lucide="x" style="width:14px;height:14px;color:var(--choc);stroke-width:2.5;"></i>
+            </button>
+          </div>
+          <div class="search-input-wrap" style="margin-bottom:16px;">
+            <i data-lucide="search"
+              style="width:16px;height:16px;color:var(--muted);stroke-width:2.2;flex-shrink:0;"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search cakes, cupcakes..."
+              oninput="handleSearch(this.value)" aria-label="Search cakes" />
+            <button id="clearSearchBtn" onclick="clearSearch()"
+              style="display:none;background:none;border:none;cursor:pointer;padding:2px;">
+              <i data-lucide="x" style="width:14px;height:14px;color:var(--muted);stroke-width:2.5;"></i>
+            </button>
+          </div>
+          <div style="margin-bottom:16px;">
+            <div
+              style="font-size:.72rem;font-weight:700;color:var(--choc-mid);margin-bottom:10px;letter-spacing:.06em;text-transform:uppercase;">
+              Categories</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <button onclick="openCategoryFromSearch('fasting')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="leaf" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i>
+                Fasting Cakes
+              </button>
+              <button onclick="openCategoryFromSearch('kerestena')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="cross" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i>
+                Kerestena
+              </button>
+              <button onclick="openCategoryFromSearch('yeshemgelena')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="baby" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i>
+                Yeshemgelena
+              </button>
+              <button onclick="openCategoryFromSearch('graduation')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="graduation-cap"
+                  style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i>
+                Graduation
+              </button>
+              <button onclick="openCategoryFromSearch('wedding')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="gem" style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i> Wedding
+              </button>
+              <button onclick="openCategoryFromSearch('birthday')" class="chip"
+                style="cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--blush)'"
+                onmouseout="this.style.background=''">
+                <i data-lucide="party-popper"
+                  style="width:12px;height:12px;color:var(--choc-mid);stroke-width:2.2;"></i> Birthday
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sheet-scroll" style="padding:0 20px 20px;">
+          <div id="searchResults"></div>
+          <div id="searchEmpty" style="text-align:center;padding:30px 0;display:none;">
+            <div class="empty-icon-wrap">
+              <i data-lucide="search-x" style="width:30px;height:30px;color:var(--choc-mid);stroke-width:1.8;"></i>
+            </div>
+            <div style="font-weight:700;color:var(--choc);margin-bottom:6px;">No results found</div>
+            <div style="font-size:.8rem;color:var(--muted);">Try a different search term</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  </div>
+
+  <script>
+    const categories = {
+      fasting: {
+        title: 'Fasting Cakes',
+        subtitle: 'የፆም ኬኮች — Delicious plant-based cakes',
+        badge: 'Vegan Friendly',
+        heroBg: 'https://images.pexels.com/photos/37661106/pexels-photo-37661106.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/32397279/pexels-photo-32397279.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'fast1', name: 'Fruit & Nut Fasting Cake', sub: 'Mixed dried fruits · Walnuts · Spiced batter · No dairy', price: 35, img: 'https://images.pexels.com/photos/37661106/pexels-photo-37661106.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'fast2', name: 'Vegan Chocolate', sub: 'Rich cocoa · Coconut milk · Dairy-free ganache', price: 38, img: 'https://images.pexels.com/photos/37262561/pexels-photo-37262561.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'fast3', name: 'Apple Cinnamon', sub: 'Fresh apples · Cinnamon spice · Oat crumble topping', price: 32, img: 'https://images.pexels.com/photos/30739085/pexels-photo-30739085.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'fast4', name: 'Carrot Walnut', sub: 'Grated carrots · Walnuts · Orange zest · Plant-based cream', price: 34, img: 'https://images.pexels.com/photos/32397279/pexels-photo-32397279.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      },
+      kerestena: {
+        title: 'Kerestena Cakes',
+        subtitle: 'የክርስትና ኬክ — For baptisms, communion & Easter',
+        badge: 'Holy Celebrations',
+        heroBg: 'https://images.pexels.com/photos/32437628/pexels-photo-32437628.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'ker1', name: 'Baptism Cross Cake', sub: 'White vanilla · Gold cross · Soft buttercream', price: 45, img: 'https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ker2', name: 'Holy Communion Cake', sub: 'Elegant white · Host detail · Floral accents', price: 55, img: 'https://images.pexels.com/photos/32437628/pexels-photo-32437628.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ker3', name: 'Easter Resurrection Cake', sub: 'Chocolate layers · Spring florals · Symbolic design', price: 48, img: 'https://images.pexels.com/photos/31336127/pexels-photo-31336127.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ker4', name: 'Confirmation Blessing', sub: 'Light sponge · Pastel frosting · Dove decoration', price: 42, img: 'https://images.pexels.com/photos/15307373/pexels-photo-15307373.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      },
+      yeshemgelena: {
+        title: 'Yeshemgelena Cakes',
+        subtitle: 'የሽምግልና ኬክ — Welcome the little one',
+        badge: 'Baby Shower',
+        heroBg: 'https://images.pexels.com/photos/29051739/pexels-photo-29051739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'ysh1', name: 'Traditional Shemgelena', sub: 'Honey bread base · Decorative icing · Cultural motifs', price: 40, img: 'https://images.pexels.com/photos/29051739/pexels-photo-29051739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ysh2', name: 'Blue Baby Welcome', sub: 'Vanilla sponge · Blue buttercream · Teddy topper', price: 38, img: 'https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ysh3', name: 'Pink Baby Shower', sub: 'Strawberry cream · Pink roses · Edible pearls', price: 38, img: 'https://images.pexels.com/photos/12742498/pexels-photo-12742498.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'ysh4', name: 'Neutral Woodland', sub: 'Earthy tones · Forest animals · Gender-neutral design', price: 42, img: 'https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      },
+      graduation: {
+        title: 'Graduation Cakes',
+        subtitle: 'የምረቃት ኬክ — Celebrate achievements',
+        badge: 'Class of 2026',
+        heroBg: 'https://images.pexels.com/photos/12419449/pexels-photo-12419449.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/9540405/pexels-photo-9540405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'grad1', name: 'Cap & Gown Tier', sub: '2-tier chocolate · Graduation cap topper · Gold details', price: 65, img: 'https://images.pexels.com/photos/9540405/pexels-photo-9540405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'grad2', name: 'Diploma Scroll', sub: 'Vanilla roll design · Edible ribbon · Personalised name', price: 50, img: 'https://images.pexels.com/photos/20768168/pexels-photo-20768168.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'grad3', name: 'Class of 2026', sub: 'Modern design · School colours · Year banner', price: 58, img: 'https://images.pexels.com/photos/12419449/pexels-photo-12419449.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'grad4', name: 'Scholar Book Stack', sub: 'Stacked book design · Fondant finish · Quote plaque', price: 55, img: 'https://images.pexels.com/photos/6210746/pexels-photo-6210746.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      },
+      wedding: {
+        title: 'Wedding & Anniversary',
+        subtitle: 'Timeless elegance for your special day',
+        badge: 'Weddings',
+        heroBg: 'https://images.pexels.com/photos/34073612/pexels-photo-34073612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/34569681/pexels-photo-34569681.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'wed1', name: '3-Tier Floral Wedding', sub: 'Vanilla sponge · Buttercream roses · Fresh greenery', price: 220, img: 'https://images.pexels.com/photos/34569681/pexels-photo-34569681.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'wed2', name: 'Anniversary Gold', sub: 'Golden fondant · Champagne accents · Sugar flowers', price: 95, img: 'https://images.pexels.com/photos/34073612/pexels-photo-34073612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'wed3', name: 'Silver Jubilee', sub: 'Silver leaf details · White tiers · 25th anniversary', price: 150, img: 'https://images.pexels.com/photos/17869890/pexels-photo-17869890.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'wed4', name: 'Classic Ivory Wedding', sub: 'Single tier · Ivory fondant · Gold leaf details', price: 120, img: 'https://images.pexels.com/photos/28378968/pexels-photo-28378968.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      },
+      birthday: {
+        title: 'Birthday & Celebration',
+        subtitle: 'For birthdays, parties & every special occasion',
+        badge: 'Celebrations',
+        heroBg: 'https://images.pexels.com/photos/2337821/pexels-photo-2337821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        heroFloat: 'https://images.pexels.com/photos/32916204/pexels-photo-32916204.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+        products: [
+          { id: 'bday1', name: 'Chocolate Celebration', sub: 'Dark chocolate sponge · Ganache drip · Strawberry topping', price: 38, img: 'https://images.pexels.com/photos/2337821/pexels-photo-2337821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'bday2', name: 'Vanilla Party Cake', sub: 'Classic vanilla · Rainbow sprinkles · Buttercream', price: 32, img: 'https://images.pexels.com/photos/32916204/pexels-photo-32916204.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'bday3', name: 'Red Velvet Party', sub: 'Red velvet layers · Cream cheese · Festive decor', price: 42, img: 'https://images.pexels.com/photos/9553739/pexels-photo-9553739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+          { id: 'bday4', name: 'Custom Theme Cake', sub: 'Your design · Any theme · Personalised message', price: 55, img: 'https://images.pexels.com/photos/5713248/pexels-photo-5713248.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        ]
+      }
+    };
+
+    const availableToday = {
+      title: 'Available for Today',
+      subtitle: 'Fresh from the oven — ready to take home now',
+      badge: 'In Store',
+      products: [
+        { id: 'avail1', name: 'Classic Vanilla Slice', sub: 'Freshly baked this morning · Light sponge · Buttercream', price: 6, img: 'https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        { id: 'avail2', name: 'Chocolate Fudge Cupcake', sub: 'Rich cocoa · Ganache topping · Sprinkles', price: 4.5, img: 'https://images.pexels.com/photos/3776947/pexels-photo-3776947.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        { id: 'avail3', name: 'Strawberry Tart', sub: 'Fresh strawberries · Custard · Flaky pastry', price: 7, img: 'https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        { id: 'avail4', name: 'Lemon Drizzle Loaf', sub: 'Zesty lemon · Sugar glaze · Moist sponge', price: 5.5, img: 'https://images.pexels.com/photos/1485806/pexels-photo-1485806.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        { id: 'avail5', name: 'Red Velvet Cookie', sub: 'Cream cheese chunks · Cocoa · Soft bake', price: 3.5, img: 'https://images.pexels.com/photos/2067396/pexels-photo-2067396.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+        { id: 'avail6', name: 'Cinnamon Roll', sub: 'Warm spice · Cream cheese glaze · Yeast dough', price: 5, img: 'https://images.pexels.com/photos/351961/pexels-photo-351961.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940' },
+      ]
+    };
+
+    let cart = {};
+    let currentCategory = null;
+    let productQtys = {};
+    let activePage = 'home';
+    let prevPage = 'home';
+
+    const allProducts = [];
+    Object.entries(categories).forEach(([catKey, cat]) => {
+      cat.products.forEach(p => allProducts.push({ ...p, catKey, catTitle: cat.title }));
+    });
+    availableToday.products.forEach(p => allProducts.push({ ...p, catKey: 'available', catTitle: 'Available Today' }));
+
+    function goPage(name) {
+      if (activePage === name) return;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('page-' + name);
+      if (!target) return;
+      target.classList.add('active');
+
+      const topbar = document.getElementById('mainTopbar');
+      topbar.style.display = name === 'home' ? 'none' : 'flex';
+
+      document.querySelectorAll('.nav-item').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-current', 'false');
+        const iconWrap = b.querySelector('.nav-icon-wrap i');
+        if (iconWrap) iconWrap.style.color = 'rgba(255,255,255,.45)';
+        const lbl = b.querySelector('.nav-label');
+        if (lbl) lbl.style.color = 'rgba(255,255,255,.45)';
+      });
+      const activeNav = document.getElementById('nav-' + name);
+      if (activeNav) {
+        activeNav.classList.add('active');
+        activeNav.setAttribute('aria-current', 'page');
+        const iconWrap = activeNav.querySelector('.nav-icon-wrap i');
+        if (iconWrap) iconWrap.style.color = 'rgba(255,255,255,.9)';
+        const lbl = activeNav.querySelector('.nav-label');
+        if (lbl) lbl.style.color = 'rgba(255,255,255,.95)';
+      }
+
+      prevPage = activePage;
+      activePage = name;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function openCategory(catKey) {
+      const cat = categories[catKey];
+      if (!cat) return;
+      currentCategory = catKey;
+      productQtys = {};
+      cat.products.forEach(p => { productQtys[p.id] = cart[p.id] ? cart[p.id].qty : 0; });
+
+      document.getElementById('detailHeroBg').src = cat.heroBg;
+      document.getElementById('detailHeroBg').alt = cat.title;
+      document.getElementById('detailHeroFloat').src = cat.heroFloat;
+      document.getElementById('detailHeroFloat').alt = cat.title;
+      document.getElementById('detailBadge').textContent = cat.badge;
+      document.getElementById('detailTitle').textContent = cat.title;
+      document.getElementById('detailSub').textContent = cat.subtitle;
+      document.getElementById('detailSubtitle').textContent = cat.products.length + ' designs available';
+
+      renderProducts(cat);
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-detail').classList.add('active');
+      document.getElementById('mainTopbar').style.display = 'flex';
+
+      document.querySelectorAll('.nav-item').forEach(b => {
+        b.classList.remove('active');
+        const iconWrap = b.querySelector('.nav-icon-wrap i');
+        if (iconWrap) iconWrap.style.color = 'rgba(255,255,255,.45)';
+        const lbl = b.querySelector('.nav-label');
+        if (lbl) lbl.style.color = 'rgba(255,255,255,.45)';
+      });
+
+      prevPage = activePage;
+      activePage = 'detail';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function closeDetail() {
+      const dest = (prevPage === 'detail' || prevPage === 'home') ? 'home' : prevPage;
+      goPage(dest);
+      if (dest === 'home') document.getElementById('mainTopbar').style.display = 'none';
+    }
+
+    function openAvailableToday() {
+      productQtys = {};
+      availableToday.products.forEach(p => { productQtys[p.id] = cart[p.id] ? cart[p.id].qty : 0; });
+
+      const grid = document.getElementById('availableGrid');
+      grid.innerHTML = '';
+      availableToday.products.forEach((p, i) => {
+        const qty = productQtys[p.id] || 0;
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', p.name);
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" style="height:120px;" />
+          <div class="product-card-body" style="padding-top:110px;">
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-sub">${p.sub}</div>
+            <div class="product-card-rule"></div>
+            <div class="product-card-foot">
+              <div>
+                <span class="cat-from">ready now</span>
+                <span class="product-card-price">$${fmtPrice(p.price)}</span>
+              </div>
+              <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-available').classList.add('active');
+      document.getElementById('mainTopbar').style.display = 'flex';
+
+      document.querySelectorAll('.nav-item').forEach(b => {
+        b.classList.remove('active');
+        const iconWrap = b.querySelector('.nav-icon-wrap i');
+        if (iconWrap) iconWrap.style.color = 'rgba(255,255,255,.45)';
+        const lbl = b.querySelector('.nav-label');
+        if (lbl) lbl.style.color = 'rgba(255,255,255,.45)';
+      });
+
+      prevPage = activePage;
+      activePage = 'available';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function closeAvailable() {
+      const dest = (prevPage === 'available' || prevPage === 'home') ? 'home' : prevPage;
+      goPage(dest);
+      if (dest === 'home') document.getElementById('mainTopbar').style.display = 'none';
+    }
+
+    function renderProducts(cat) {
+      const list = document.getElementById('productList');
+      list.className = 'product-list';
+      list.innerHTML = '';
+      cat.products.forEach((p, i) => {
+        const qty = productQtys[p.id] || 0;
+        const item = document.createElement('article');
+        item.className = 'product-list-item';
+        item.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
+        item.setAttribute('aria-label', p.name);
+        item.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" class="product-list-img" loading="lazy" />
+          <div class="product-list-info">
+            <div class="product-list-name">${p.name}</div>
+            <div class="product-list-sub">${p.sub}</div>
+            <div class="product-list-foot">
+              <div class="product-list-price">$${fmtPrice(p.price)}</div>
+              <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
+            </div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function stepperHTML(id, qty) {
+      if (qty === 0) {
+        return `<button class="step-btn plus" onclick="addProduct('${id}')" aria-label="Add to cart">
+          <i data-lucide="plus" style="width:13px;height:13px;stroke-width:3;"></i>
+        </button>`;
+      }
+      return `
+        <button class="step-btn minus" onclick="decreaseProduct('${id}')" aria-label="Decrease">
+          <i data-lucide="minus" style="width:12px;height:12px;stroke-width:3;"></i>
+        </button>
+        <span class="step-count">${qty}</span>
+        <button class="step-btn plus" onclick="increaseProduct('${id}')" aria-label="Increase">
+          <i data-lucide="plus" style="width:12px;height:12px;stroke-width:3;"></i>
+        </button>
+      `;
+    }
+
+    function getProduct(id) { return allProducts.find(p => p.id === id) || null; }
+
+    function addProduct(id) {
+      const p = getProduct(id);
+      if (!p) return;
+      productQtys[id] = 1;
+      cart[id] = { product: p, qty: 1 };
+      refreshStepper(id);
+      updateUI();
+      showToast('Added to cart');
+    }
+
+    function increaseProduct(id) {
+      if (!cart[id]) return addProduct(id);
+      productQtys[id] = (productQtys[id] || 0) + 1;
+      cart[id].qty = productQtys[id];
+      refreshStepper(id);
+      updateUI();
+    }
+
+    function decreaseProduct(id) {
+      if (!productQtys[id]) return;
+      productQtys[id]--;
+      if (productQtys[id] <= 0) { productQtys[id] = 0; delete cart[id]; }
+      else cart[id].qty = productQtys[id];
+      refreshStepper(id);
+      updateUI();
+    }
+
+    function refreshStepper(id) {
+      const wrap = document.getElementById('stepper-' + id);
+      if (!wrap) return;
+      wrap.innerHTML = stepperHTML(id, productQtys[id] || 0);
+      lucide.createIcons();
+    }
+
+    function getTotal() { return Object.values(cart).reduce((s, { product, qty }) => s + product.price * qty, 0); }
+    function getCount() { return Object.values(cart).reduce((s, { qty }) => s + qty, 0); }
+    function fmtPrice(n) { return n % 1 === 0 ? n.toString() : n.toFixed(2); }
+
+    function updateUI() {
+      const total = getTotal();
+      const count = getCount();
+      const topBadge = document.getElementById('topCartBadge');
+      const heroBadge = document.getElementById('heroCartBadge');
+      const navBadge = document.getElementById('navCartBadge');
+      const navTotal = document.getElementById('navTotal');
+      if (topBadge) { topBadge.textContent = count; topBadge.classList.toggle('show', count > 0); }
+      if (heroBadge) { heroBadge.textContent = count; heroBadge.classList.toggle('show', count > 0); }
+      if (navBadge) { navBadge.textContent = count; navBadge.classList.toggle('show', count > 0); }
+      if (navTotal) { navTotal.textContent = '$' + total.toFixed(2); navTotal.style.opacity = count > 0 ? '1' : '0'; }
+    }
+
+    function openCart() {
+      renderCart();
+      document.getElementById('cartSheet').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCart() {
+      document.getElementById('cartSheet').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function handleSheetClick(e) {
+      if (e.target === document.getElementById('cartSheet')) closeCart();
+    }
+
+    function openSearchSheet() {
+      document.getElementById('searchSheet').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => document.getElementById('searchInput').focus(), 150);
+    }
+
+    function closeSearchSheet() {
+      document.getElementById('searchSheet').classList.remove('show');
+      document.body.style.overflow = '';
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('searchResults').className = '';
+      document.getElementById('searchEmpty').style.display = 'none';
+      document.getElementById('clearSearchBtn').style.display = 'none';
+    }
+
+    function handleSearchSheetClick(e) {
+      if (e.target === document.getElementById('searchSheet')) closeSearchSheet();
+    }
+
+    function openCategoryFromSearch(catKey) {
+      closeSearchSheet();
+      setTimeout(() => openCategory(catKey), 80);
+    }
+
+    function renderCart() {
+      const items = Object.values(cart);
+      const content = document.getElementById('cartContent');
+      const empty = document.getElementById('cartEmpty');
+      const footer = document.getElementById('cartFooter');
+      const subtotalEl = document.getElementById('cartSubtotal');
+      const totalEl = document.getElementById('cartTotalAmount');
+
+      if (items.length === 0) {
+        content.innerHTML = '';
+        empty.style.display = 'block';
+        footer.style.display = 'none';
+        return;
+      }
+
+      empty.style.display = 'none';
+      footer.style.display = 'block';
+      const total = getTotal();
+      subtotalEl.textContent = '$' + total.toFixed(2);
+      totalEl.textContent = '$' + total.toFixed(2);
+
+      content.innerHTML = items.map(({ product, qty }) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--blush);">
+          <img src="${product.img}" alt="${product.name}" style="width:64px;height:64px;object-fit:cover;border-radius:14px;flex-shrink:0;box-shadow:0 4px 12px rgba(46,21,3,.12);" loading="lazy" />
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.88rem;font-weight:700;color:var(--choc);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${product.name}</div>
+            <div style="font-size:.74rem;color:var(--muted);margin-bottom:6px;">${qty} × $${fmtPrice(product.price)}</div>
+            <div style="font-size:1rem;font-weight:800;color:var(--choc);">$${(product.price * qty).toFixed(2)}</div>
+          </div>
+          <button onclick="removeCartItem('${product.id}')" aria-label="Remove ${product.name}" style="width:32px;height:32px;border-radius:50%;background:var(--blush);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;" onmouseover="this.style.background='var(--blush-dark)'" onmouseout="this.style.background='var(--blush)'">
+            <i data-lucide="trash-2" style="width:14px;height:14px;color:var(--choc);stroke-width:2.2;"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function removeCartItem(id) {
+      delete cart[id];
+      if (productQtys[id] !== undefined) productQtys[id] = 0;
+      refreshStepper(id);
+      updateUI();
+      renderCart();
+    }
+
+    function checkout() {
+      closeCart();
+      cart = {};
+      productQtys = {};
+      updateUI();
+      if (currentCategory) {
+        const cat = categories[currentCategory];
+        if (cat) renderProducts(cat);
+      }
+      if (activePage === 'available') {
+        openAvailableToday();
+      }
+      showToast('Order placed! Thank you!');
+    }
+
+    function handleSearch(val) {
+      const clear = document.getElementById('clearSearchBtn');
+      clear.style.display = val ? 'block' : 'none';
+      const results = document.getElementById('searchResults');
+      const empty = document.getElementById('searchEmpty');
+      const q = val.toLowerCase().trim();
+      if (!q) { results.innerHTML = ''; results.className = ''; empty.style.display = 'none'; return; }
+      const matches = allProducts.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.sub.toLowerCase().includes(q) ||
+        p.catTitle.toLowerCase().includes(q)
+      );
+      if (matches.length === 0) { results.innerHTML = ''; results.className = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      results.className = 'card-grid';
+      results.innerHTML = '';
+      matches.forEach((p, i) => {
+        const qty = cart[p.id] ? cart[p.id].qty : 0;
+        productQtys[p.id] = qty;
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.style.cssText = `opacity:0;animation:scaleIn 0.3s ease ${i * 0.05}s both;`;
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" />
+          <div class="product-card-body">
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-sub">${p.catTitle} · ${p.sub.split('·')[0]}</div>
+            <div class="product-card-rule"></div>
+            <div class="product-card-foot">
+              <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
+              <div class="product-card-price">$${fmtPrice(p.price)}</div>
+            </div>
+          </div>
+        `;
+        results.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      handleSearch('');
+      input.focus();
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('searchSheet').classList.contains('show')) { closeSearchSheet(); return; }
+        if (document.getElementById('cartSheet').classList.contains('show')) { closeCart(); return; }
+        if (activePage === 'available') { closeAvailable(); return; }
+        if (activePage === 'detail') { closeDetail(); return; }
+      }
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute('role') === 'button') {
+        e.preventDefault(); e.target.click();
+      }
+    });
+
+    // Splash screen auto-hide after animation completes
+    function hideSplash() {
+      const splash = document.getElementById('splash-overlay');
+      const app = document.getElementById('app');
+      if (!splash) return;
+      splash.classList.add('exiting');
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        if (app) app.classList.add('visible');
+      }, 800);
+    }
+
+    // Initialize after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      lucide.createIcons();
+      updateUI();
+      // Hide splash after text animation completes (~3.5s) + buffer
+      setTimeout(hideSplash, 3500);
+    }
+  </script>
+</body>
+
+</html>
