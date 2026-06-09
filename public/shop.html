@@ -2226,13 +2226,59 @@
         return;
       }
 
-      closeCart();
+      // Build a Telegram deep-link with the order pre-filled
+      const lines = [];
+      lines.push('🌸 Selam Cake & Arts — New Order');
+      lines.push('');
+      lines.push('👤 Name: ' + name);
+      lines.push('📞 Phone: ' + phone);
+      if (address) lines.push('📍 Address: ' + address);
+      lines.push('');
+      lines.push('🧁 Items:');
+      items.forEach(({ product, qty }) => {
+        lines.push('• ' + product.name + ' × ' + qty + ' — $' + (product.price * qty).toFixed(2));
+      });
+      lines.push('');
+      lines.push('💰 Total: $' + getTotal().toFixed(2));
+      const tgUrl = 'https://t.me/selamina22?text=' + encodeURIComponent(lines.join('\n'));
+
+      // Replace cart contents with a success panel + "Send to Telegram" button
+      const content = document.getElementById('cartContent');
+      const footer = document.getElementById('cartFooter');
+      const customer = document.getElementById('cartCustomer');
+      const empty = document.getElementById('cartEmpty');
+      if (customer) customer.style.display = 'none';
+      if (footer) footer.style.display = 'none';
+      if (empty) empty.style.display = 'none';
+      content.innerHTML = `
+        <div style="text-align:center;padding:24px 12px;">
+          <div style="width:72px;height:72px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <i data-lucide="check" style="width:36px;height:36px;color:#059669;stroke-width:2.5;"></i>
+          </div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--choc);margin-bottom:6px;">Order placed!</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:20px;">Tap below to notify us on Telegram so we can confirm.</div>
+          <a href="${tgUrl}" target="_blank" rel="noopener"
+             style="display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;background:linear-gradient(135deg,#229ED9,#1b88bf);color:white;text-decoration:none;border-radius:18px;padding:16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:700;box-shadow:0 5px 18px rgba(34,158,217,.35);">
+            <i data-lucide="send" style="width:18px;height:18px;stroke-width:2.2;"></i>
+            Send to Telegram
+          </a>
+          <button onclick="resetCartAfterOrder()" style="margin-top:12px;width:100%;background:transparent;color:var(--choc-mid);border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;padding:10px;">
+            Done
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+
       cart = {};
       productQtys = {};
-      const n = document.getElementById('custName'); if (n) n.value = '';
-      const p = document.getElementById('custPhone'); if (p) p.value = '';
-      const a = document.getElementById('custAddress'); if (a) a.value = '';
+      const nEl = document.getElementById('custName'); if (nEl) nEl.value = '';
+      const pEl = document.getElementById('custPhone'); if (pEl) pEl.value = '';
+      const aEl = document.getElementById('custAddress'); if (aEl) aEl.value = '';
       updateUI();
+    }
+
+    function resetCartAfterOrder() {
+      closeCart();
       if (currentCategory) {
         const cat = categories[currentCategory];
         if (cat) renderProducts(cat);
@@ -2240,7 +2286,7 @@
       if (activePage === 'available') {
         openAvailableToday();
       }
-      showToast('Order placed! Thank you!');
+      showToast('Thank you!');
     }
 
     function handleSearch(val) {
