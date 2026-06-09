@@ -2109,12 +2109,14 @@
     function addProduct(id) {
       const p = getProduct(id);
       if (!p) return;
+      if (!isItemAvailable(id)) { showToast('Sold out for today'); return; }
       productQtys[id] = 1;
       cart[id] = { product: p, qty: 1 };
       refreshStepper(id);
       updateUI();
       showToast('Added to cart');
     }
+
 
     function increaseProduct(id) {
       if (!cart[id]) return addProduct(id);
