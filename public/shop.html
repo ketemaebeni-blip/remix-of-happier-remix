@@ -1919,11 +1919,101 @@
     let activePage = 'home';
     let prevPage = 'home';
 
+    // Availability map: { item_id: boolean }. Default: assume available until loaded.
+    let availabilityMap = {};
+    let sbClient = null;
+    function isItemAvailable(id) {
+      return availabilityMap[id] !== false; // unknown/true => available
+    }
+
     const allProducts = [];
     Object.entries(categories).forEach(([catKey, cat]) => {
       cat.products.forEach(p => allProducts.push({ ...p, catKey, catTitle: cat.title }));
     });
     availableToday.products.forEach(p => allProducts.push({ ...p, catKey: 'available', catTitle: 'Available Today' }));
+
+    function rerenderActive() {
+      if (activePage === 'detail' && currentCategory) {
+        const cat = categories[currentCategory];
+        if (cat) renderProducts(cat);
+      } else if (activePage === 'available') {
+        // re-open keeps state
+        productQtys = {};
+        availableToday.products.forEach(p => { productQtys[p.id] = cart[p.id] ? cart[p.id].qty : 0; });
+        const grid = document.getElementById('availableGrid');
+        if (grid) {
+          // trigger same render path
+          openAvailableTodayRender();
+        }
+      }
+      // Re-run search if open
+      const si = document.getElementById('searchInput');
+      if (si && document.getElementById('searchSheet').classList.contains('show') && si.value) {
+        handleSearch(si.value);
+      }
+    }
+
+    function openAvailableTodayRender() {
+      const grid = document.getElementById('availableGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      availableToday.products.forEach((p, i) => {
+        const qty = productQtys[p.id] || 0;
+        const isOut = !isItemAvailable(p.id);
+        const card = document.createElement('article');
+        card.className = 'product-card' + (isOut ? ' sold-out' : '');
+        card.style.cssText = `opacity:0;animation:fadeUp 0.38s cubic-bezier(.22,1,.36,1) ${0.05 + i * 0.07}s both;`;
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', p.name);
+        card.innerHTML = `
+          <span class="status-badge ${isOut ? 'out' : 'in'}">${isOut ? 'Sold Out' : 'Available'}</span>
+          <img src="${p.img}" alt="${p.name}" class="product-card-img" loading="lazy" style="height:120px;" />
+          <div class="product-card-body" style="padding-top:110px;">
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-sub">${p.sub}</div>
+            <div class="product-card-rule"></div>
+            <div class="product-card-foot">
+              <div>
+                <span class="cat-from">${isOut ? 'unavailable' : 'ready now'}</span>
+                <span class="product-card-price">$${fmtPrice(p.price)}</span>
+              </div>
+              <div class="stepper" id="stepper-${p.id}">${stepperHTML(p.id, qty)}</div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    async function initAvailability() {
+      try {
+        if (!window.supabase) return;
+        const SUPABASE_URL = 'https://gjyhukhtwzhgmrpdifbp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqeWh1a2h0d3poZ21ycGRpZmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDA3NzYsImV4cCI6MjA5NjU3Njc3Nn0.pQupb9pS4w-j72bCagqHSfJqEZy9XpznlAK2rSE0PBo';
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data, error } = await sbClient.from('shop_item_availability').select('item_id, available');
+        if (!error && data) {
+          availabilityMap = {};
+          data.forEach(r => { availabilityMap[r.item_id] = r.available; });
+          rerenderActive();
+        }
+        sbClient
+          .channel('shop_avail_rt')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_item_availability' }, (payload) => {
+            const row = payload.new || payload.old;
+            if (row && row.item_id) {
+              if (payload.eventType === 'DELETE') delete availabilityMap[row.item_id];
+              else availabilityMap[row.item_id] = row.available;
+              rerenderActive();
+            }
+          })
+          .subscribe();
+      } catch (e) { console.warn('availability init failed', e); }
+    }
+
+
 
     function goPage(name) {
       if (activePage === name) return;
