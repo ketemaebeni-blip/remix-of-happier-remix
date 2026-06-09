@@ -2138,6 +2138,7 @@
       const content = document.getElementById('cartContent');
       const empty = document.getElementById('cartEmpty');
       const footer = document.getElementById('cartFooter');
+      const customer = document.getElementById('cartCustomer');
       const subtotalEl = document.getElementById('cartSubtotal');
       const totalEl = document.getElementById('cartTotalAmount');
 
@@ -2145,11 +2146,13 @@
         content.innerHTML = '';
         empty.style.display = 'block';
         footer.style.display = 'none';
+        if (customer) customer.style.display = 'none';
         return;
       }
 
       empty.style.display = 'none';
       footer.style.display = 'block';
+      if (customer) customer.style.display = 'block';
       const total = getTotal();
       subtotalEl.textContent = '$' + total.toFixed(2);
       totalEl.textContent = '$' + total.toFixed(2);
@@ -2178,10 +2181,57 @@
       renderCart();
     }
 
-    function checkout() {
+    function toAbsoluteUrl(u) {
+      if (!u) return null;
+      try { return new URL(u, window.location.origin).href; } catch { return null; }
+    }
+
+    async function checkout() {
+      const items = Object.values(cart);
+      if (items.length === 0) { showToast('Your cart is empty'); return; }
+
+      const name = (document.getElementById('custName')?.value || '').trim();
+      const phone = (document.getElementById('custPhone')?.value || '').trim();
+      const address = (document.getElementById('custAddress')?.value || '').trim();
+      if (!name || !phone) { showToast('Please enter your name and phone'); return; }
+
+      const payload = {
+        customer_name: name,
+        customer_phone: phone,
+        customer_address: address,
+        items: items.map(({ product, qty }) => ({
+          name: product.name,
+          qty,
+          price: Number(product.price),
+          img: toAbsoluteUrl(product.img),
+        })),
+        total: Number(getTotal().toFixed(2)),
+      };
+
+      showToast('Placing order…');
+      try {
+        const res = await fetch('/api/public/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          console.error('order failed', await res.text());
+          showToast('Order failed. Please try again.');
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+        showToast('Network error. Please try again.');
+        return;
+      }
+
       closeCart();
       cart = {};
       productQtys = {};
+      const n = document.getElementById('custName'); if (n) n.value = '';
+      const p = document.getElementById('custPhone'); if (p) p.value = '';
+      const a = document.getElementById('custAddress'); if (a) a.value = '';
       updateUI();
       if (currentCategory) {
         const cat = categories[currentCategory];
