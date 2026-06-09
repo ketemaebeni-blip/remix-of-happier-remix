@@ -133,13 +133,24 @@ function AdminDashboard() {
       const admin = !!roles?.some((r: any) => r.role === "admin");
       setIsAdmin(admin);
       setReady(true);
-      if (admin) loadOrders();
+      if (admin) { loadOrders(); loadShopAvail(); }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) nav({ to: "/admin/login" });
     });
     return () => sub.subscription.unsubscribe();
-  }, [nav, loadOrders]);
+  }, [nav, loadOrders, loadShopAvail]);
+
+  // Live shop availability
+  useEffect(() => {
+    if (!isAdmin) return;
+    const ch = supabase
+      .channel("shop_avail_admin")
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_item_availability" }, () => loadShopAvail())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [isAdmin, loadShopAvail]);
+
 
   // Live orders
   useEffect(() => {
