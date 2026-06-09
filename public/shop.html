@@ -1168,9 +1168,62 @@
     }
 
     .available-card:active { transform: scale(.98); }
+
+    /* STATUS BADGES (Available / Sold Out) */
+    .status-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 4;
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 999px;
+      box-shadow: 0 3px 10px rgba(46, 21, 3, .18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .status-badge.in {
+      background: rgba(220, 252, 231, .95);
+      color: #047857;
+      border: 1px solid rgba(5, 150, 105, .25);
+    }
+    .status-badge.out {
+      background: rgba(254, 226, 226, .95);
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, .25);
+    }
+    .product-card, .product-list-item { position: relative; }
+    .product-card.sold-out .product-card-img,
+    .product-list-item.sold-out .product-list-img {
+      filter: grayscale(.85) brightness(.92);
+      opacity: .75;
+    }
+    .product-card.sold-out .step-btn.plus,
+    .product-list-item.sold-out .step-btn.plus {
+      background: #d6d3d1 !important;
+      cursor: not-allowed !important;
+      pointer-events: none;
+    }
+    .list-status-badge {
+      display: inline-block;
+      font-size: .58rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .list-status-badge.in { background: #dcfce7; color: #047857; }
+    .list-status-badge.out { background: #fee2e2; color: #b91c1c; }
   </style>
   <base target="_blank">
 </head>
+
 
 <body>
 
