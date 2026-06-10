@@ -320,12 +320,17 @@
     }
 
     @media (min-width: 640px) {
-      #app { max-width: 520px; border-radius: 24px; margin-top: 12px; margin-bottom: 12px; }
+      #app { max-width: 760px; border-radius: 24px; margin-top: 12px; margin-bottom: 12px; }
       body { background: linear-gradient(135deg, #F9D9D3 0%, #FDF6EE 50%, #FAC5A3 100%); background-attachment: fixed; }
     }
     @media (min-width: 1024px) {
-      #app { max-width: 560px; }
+      #app { max-width: 1024px; }
     }
+    @media (min-width: 1280px) {
+      #app { max-width: 1200px; }
+    }
+    /* Ensure last row content clears the floating bottom nav */
+    .page { padding-bottom: 140px; }
 
     /* TOPBAR */
     .topbar {
