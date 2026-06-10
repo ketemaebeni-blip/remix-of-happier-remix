@@ -2030,31 +2030,52 @@
       lucide.createIcons();
     }
 
+    const catToKey = { 'Fasting': 'fasting', 'Kerestena': 'kerestena', 'Yeshemgelena': 'yeshemgelena', 'Graduation': 'graduation', 'Wedding': 'wedding', 'Birthday': 'birthday', 'Available Today': 'available' };
+
+    async function loadShopItems() {
+      if (!sbClient) return;
+      const { data, error } = await sbClient
+        .from('shop_items')
+        .select('id, name, sub, cat, price, img, available, sort_order')
+        .order('sort_order', { ascending: true });
+      if (error || !data) return;
+      Object.values(categories).forEach(c => { c.products = []; });
+      availableToday.products = [];
+      availabilityMap = {};
+      data.forEach(r => {
+        availabilityMap[r.id] = r.available;
+        const key = catToKey[r.cat];
+        const p = { id: r.id, name: r.name, sub: r.sub, price: Number(r.price), img: r.img };
+        if (key === 'available') availableToday.products.push(p);
+        else if (key && categories[key]) categories[key].products.push(p);
+      });
+      allProducts.length = 0;
+      Object.entries(categories).forEach(([catKey, cat]) => {
+        cat.products.forEach(p => allProducts.push({ ...p, catKey, catTitle: cat.title }));
+      });
+      availableToday.products.forEach(p => allProducts.push({ ...p, catKey: 'available', catTitle: 'Available Today' }));
+    }
+
     async function initAvailability() {
       try {
         if (!window.supabase) return;
         const SUPABASE_URL = 'https://gjyhukhtwzhgmrpdifbp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqeWh1a2h0d3poZ21ycGRpZmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDA3NzYsImV4cCI6MjA5NjU3Njc3Nn0.pQupb9pS4w-j72bCagqHSfJqEZy9XpznlAK2rSE0PBo';
         sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data, error } = await sbClient.from('shop_item_availability').select('item_id, available');
-        if (!error && data) {
-          availabilityMap = {};
-          data.forEach(r => { availabilityMap[r.item_id] = r.available; });
-          rerenderActive();
-        }
+        await loadShopItems();
+        rerenderActive();
+        updateUI();
         sbClient
-          .channel('shop_avail_rt')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_item_availability' }, (payload) => {
-            const row = payload.new || payload.old;
-            if (row && row.item_id) {
-              if (payload.eventType === 'DELETE') delete availabilityMap[row.item_id];
-              else availabilityMap[row.item_id] = row.available;
-              rerenderActive();
-            }
+          .channel('shop_items_rt')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_items' }, async () => {
+            await loadShopItems();
+            rerenderActive();
+            updateUI();
           })
           .subscribe();
-      } catch (e) { console.warn('availability init failed', e); }
+      } catch (e) { console.warn('shop items init failed', e); }
     }
+
 
 
 
