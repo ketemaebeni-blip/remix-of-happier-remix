@@ -70,7 +70,7 @@ function AdminDashboard() {
       .order("cat", { ascending: true })
       .order("sort_order", { ascending: true });
     if (error) { console.error("Load shop items failed", error); return; }
-    setItems((data ?? []) as ShopItem[]);
+    setItems(((data ?? []) as unknown) as ShopItem[]);
   }, []);
 
   async function toggleAvail(it: ShopItem) {
