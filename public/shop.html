@@ -320,12 +320,17 @@
     }
 
     @media (min-width: 640px) {
-      #app { max-width: 520px; border-radius: 24px; margin-top: 12px; margin-bottom: 12px; }
+      #app { max-width: 760px; border-radius: 24px; margin-top: 12px; margin-bottom: 12px; }
       body { background: linear-gradient(135deg, #F9D9D3 0%, #FDF6EE 50%, #FAC5A3 100%); background-attachment: fixed; }
     }
     @media (min-width: 1024px) {
-      #app { max-width: 560px; }
+      #app { max-width: 1024px; }
     }
+    @media (min-width: 1280px) {
+      #app { max-width: 1200px; }
+    }
+    /* Ensure last row content clears the floating bottom nav */
+    .page { padding-bottom: 140px; }
 
     /* TOPBAR */
     .topbar {
@@ -350,9 +355,9 @@
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 520px;
+      max-width: 460px;
       z-index: 150;
-      padding: 10px 16px calc(10px + var(--safe-bottom));
+      padding: 12px 18px calc(18px + var(--safe-bottom));
       background: transparent;
       pointer-events: none;
     }
@@ -673,10 +678,13 @@
     /* PRODUCT CARDS */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 28px 14px;
+      grid-template-columns: 1fr;
+      gap: 22px 16px;
       padding-top: 8px;
     }
+    @media (min-width: 520px) { .card-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 16px; } }
+    @media (min-width: 900px) { .card-grid { grid-template-columns: repeat(3, 1fr); gap: 32px 20px; } }
+    @media (min-width: 1200px) { .card-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .product-card {
       background: var(--white);
@@ -762,11 +770,13 @@
 
     /* PRODUCT LIST */
     .product-list {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 16px;
       padding-top: 8px;
     }
+    @media (min-width: 720px) { .product-list { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1100px) { .product-list { grid-template-columns: repeat(3, 1fr); } }
 
     .product-list-item {
       background: var(--white);
@@ -993,6 +1003,29 @@
     }
 
     .sheet-overlay.show .sheet-panel { transform: translateY(0); }
+
+    /* CART centered modal override */
+    #cartSheet {
+      align-items: center;
+      padding: 16px;
+      background: rgba(46, 21, 3, .55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 250;
+    }
+    #cartSheet .sheet-panel {
+      max-width: 440px;
+      max-height: 86dvh;
+      border-radius: 26px;
+      transform: translateY(20px) scale(.96);
+      opacity: 0;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .25s ease;
+      box-shadow: 0 30px 80px rgba(46, 21, 3, .35);
+    }
+    #cartSheet.show .sheet-panel { transform: translateY(0) scale(1); opacity: 1; }
+    #cartSheet .sheet-handle-wrap { display: none; }
+    #cartSheet .sheet-head { padding-top: 22px; }
+    @media (min-width: 768px) { #cartSheet .sheet-panel { max-width: 480px; } }
 
     .sheet-handle-wrap {
       padding: 12px 0 0;
@@ -1997,31 +2030,52 @@
       lucide.createIcons();
     }
 
+    const catToKey = { 'Fasting': 'fasting', 'Kerestena': 'kerestena', 'Yeshemgelena': 'yeshemgelena', 'Graduation': 'graduation', 'Wedding': 'wedding', 'Birthday': 'birthday', 'Available Today': 'available' };
+
+    async function loadShopItems() {
+      if (!sbClient) return;
+      const { data, error } = await sbClient
+        .from('shop_items')
+        .select('id, name, sub, cat, price, img, available, sort_order')
+        .order('sort_order', { ascending: true });
+      if (error || !data) return;
+      Object.values(categories).forEach(c => { c.products = []; });
+      availableToday.products = [];
+      availabilityMap = {};
+      data.forEach(r => {
+        availabilityMap[r.id] = r.available;
+        const key = catToKey[r.cat];
+        const p = { id: r.id, name: r.name, sub: r.sub, price: Number(r.price), img: r.img };
+        if (key === 'available') availableToday.products.push(p);
+        else if (key && categories[key]) categories[key].products.push(p);
+      });
+      allProducts.length = 0;
+      Object.entries(categories).forEach(([catKey, cat]) => {
+        cat.products.forEach(p => allProducts.push({ ...p, catKey, catTitle: cat.title }));
+      });
+      availableToday.products.forEach(p => allProducts.push({ ...p, catKey: 'available', catTitle: 'Available Today' }));
+    }
+
     async function initAvailability() {
       try {
         if (!window.supabase) return;
         const SUPABASE_URL = 'https://gjyhukhtwzhgmrpdifbp.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqeWh1a2h0d3poZ21ycGRpZmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDA3NzYsImV4cCI6MjA5NjU3Njc3Nn0.pQupb9pS4w-j72bCagqHSfJqEZy9XpznlAK2rSE0PBo';
         sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data, error } = await sbClient.from('shop_item_availability').select('item_id, available');
-        if (!error && data) {
-          availabilityMap = {};
-          data.forEach(r => { availabilityMap[r.item_id] = r.available; });
-          rerenderActive();
-        }
+        await loadShopItems();
+        rerenderActive();
+        updateUI();
         sbClient
-          .channel('shop_avail_rt')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_item_availability' }, (payload) => {
-            const row = payload.new || payload.old;
-            if (row && row.item_id) {
-              if (payload.eventType === 'DELETE') delete availabilityMap[row.item_id];
-              else availabilityMap[row.item_id] = row.available;
-              rerenderActive();
-            }
+          .channel('shop_items_rt')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shop_items' }, async () => {
+            await loadShopItems();
+            rerenderActive();
+            updateUI();
           })
           .subscribe();
-      } catch (e) { console.warn('availability init failed', e); }
+      } catch (e) { console.warn('shop items init failed', e); }
     }
+
 
 
 

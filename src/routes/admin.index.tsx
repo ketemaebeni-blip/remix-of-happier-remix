@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Cake, LayoutGrid, ShoppingBag, LogOut, Store,
-  Boxes, CheckCircle2, XCircle, Tag,
+  Boxes, CheckCircle2, XCircle, Tag, Plus, Pencil, Trash2, Upload, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import "@/components/sweet-bloom/menu-admin.css";
@@ -17,40 +17,18 @@ const fmtBirr = (n: number) =>
 
 type Section = "overview" | "orders" | "menu";
 
-// Shop catalog — mirrors items shown in public/shop.html
-type ShopItem = { id: string; name: string; sub: string; cat: string; price: number; img: string };
-const SHOP_ITEMS: ShopItem[] = [
-  { id: "fast1", name: "Fruit & Nut Fasting Cake", sub: "Mixed dried fruits · Walnuts · Spiced batter · No dairy", cat: "Fasting", price: 35, img: "https://images.pexels.com/photos/37661106/pexels-photo-37661106.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "fast2", name: "Vegan Chocolate", sub: "Rich cocoa · Coconut milk · Dairy-free ganache", cat: "Fasting", price: 38, img: "https://images.pexels.com/photos/37262561/pexels-photo-37262561.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "fast3", name: "Apple Cinnamon", sub: "Fresh apples · Cinnamon spice · Oat crumble topping", cat: "Fasting", price: 32, img: "https://images.pexels.com/photos/30739085/pexels-photo-30739085.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "fast4", name: "Carrot Walnut", sub: "Grated carrots · Walnuts · Orange zest · Plant-based cream", cat: "Fasting", price: 34, img: "https://images.pexels.com/photos/32397279/pexels-photo-32397279.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ker1", name: "Baptism Cross Cake", sub: "White vanilla · Gold cross · Soft buttercream", cat: "Kerestena", price: 45, img: "https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ker2", name: "Holy Communion Cake", sub: "Elegant white · Host detail · Floral accents", cat: "Kerestena", price: 55, img: "https://images.pexels.com/photos/32437628/pexels-photo-32437628.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ker3", name: "Easter Resurrection Cake", sub: "Chocolate layers · Spring florals · Symbolic design", cat: "Kerestena", price: 48, img: "https://images.pexels.com/photos/31336127/pexels-photo-31336127.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ker4", name: "Confirmation Blessing", sub: "Light sponge · Pastel frosting · Dove decoration", cat: "Kerestena", price: 42, img: "https://images.pexels.com/photos/15307373/pexels-photo-15307373.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ysh1", name: "Traditional Shemgelena", sub: "Honey bread base · Decorative icing · Cultural motifs", cat: "Yeshemgelena", price: 40, img: "https://images.pexels.com/photos/29051739/pexels-photo-29051739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ysh2", name: "Blue Baby Welcome", sub: "Vanilla sponge · Blue buttercream · Teddy topper", cat: "Yeshemgelena", price: 38, img: "https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ysh3", name: "Pink Baby Shower", sub: "Strawberry cream · Pink roses · Edible pearls", cat: "Yeshemgelena", price: 38, img: "https://images.pexels.com/photos/12742498/pexels-photo-12742498.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "ysh4", name: "Neutral Woodland", sub: "Earthy tones · Forest animals · Gender-neutral design", cat: "Yeshemgelena", price: 42, img: "https://images.pexels.com/photos/30233124/pexels-photo-30233124.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "grad1", name: "Cap & Gown Tier", sub: "2-tier chocolate · Graduation cap topper · Gold details", cat: "Graduation", price: 65, img: "https://images.pexels.com/photos/9540405/pexels-photo-9540405.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "grad2", name: "Diploma Scroll", sub: "Vanilla roll design · Edible ribbon · Personalised name", cat: "Graduation", price: 50, img: "https://images.pexels.com/photos/20768168/pexels-photo-20768168.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "grad3", name: "Class of 2026", sub: "Modern design · School colours · Year banner", cat: "Graduation", price: 58, img: "https://images.pexels.com/photos/12419449/pexels-photo-12419449.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "grad4", name: "Scholar Book Stack", sub: "Stacked book design · Fondant finish · Quote plaque", cat: "Graduation", price: 55, img: "https://images.pexels.com/photos/6210746/pexels-photo-6210746.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "wed1", name: "3-Tier Floral Wedding", sub: "Vanilla sponge · Buttercream roses · Fresh greenery", cat: "Wedding", price: 220, img: "https://images.pexels.com/photos/34569681/pexels-photo-34569681.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "wed2", name: "Anniversary Gold", sub: "Golden fondant · Champagne accents · Sugar flowers", cat: "Wedding", price: 95, img: "https://images.pexels.com/photos/34073612/pexels-photo-34073612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "wed3", name: "Silver Jubilee", sub: "Silver leaf details · White tiers · 25th anniversary", cat: "Wedding", price: 150, img: "https://images.pexels.com/photos/17869890/pexels-photo-17869890.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "wed4", name: "Classic Ivory Wedding", sub: "Single tier · Ivory fondant · Gold leaf details", cat: "Wedding", price: 120, img: "https://images.pexels.com/photos/28378968/pexels-photo-28378968.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "bday1", name: "Chocolate Celebration", sub: "Dark chocolate sponge · Ganache drip · Strawberry topping", cat: "Birthday", price: 38, img: "https://images.pexels.com/photos/2337821/pexels-photo-2337821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "bday2", name: "Vanilla Party Cake", sub: "Classic vanilla · Rainbow sprinkles · Buttercream", cat: "Birthday", price: 32, img: "https://images.pexels.com/photos/32916204/pexels-photo-32916204.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "bday3", name: "Red Velvet Party", sub: "Red velvet layers · Cream cheese · Festive decor", cat: "Birthday", price: 42, img: "https://images.pexels.com/photos/9553739/pexels-photo-9553739.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "bday4", name: "Custom Theme Cake", sub: "Your design · Any theme · Personalised message", cat: "Birthday", price: 55, img: "https://images.pexels.com/photos/5713248/pexels-photo-5713248.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail1", name: "Classic Vanilla Slice", sub: "Freshly baked this morning · Light sponge · Buttercream", cat: "Available Today", price: 6, img: "https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail2", name: "Chocolate Fudge Cupcake", sub: "Rich cocoa · Ganache topping · Sprinkles", cat: "Available Today", price: 4.5, img: "https://images.pexels.com/photos/3776947/pexels-photo-3776947.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail3", name: "Strawberry Tart", sub: "Fresh strawberries · Custard · Flaky pastry", cat: "Available Today", price: 7, img: "https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail4", name: "Lemon Drizzle Loaf", sub: "Zesty lemon · Sugar glaze · Moist sponge", cat: "Available Today", price: 5.5, img: "https://images.pexels.com/photos/1485806/pexels-photo-1485806.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail5", name: "Red Velvet Cookie", sub: "Cream cheese chunks · Cocoa · Soft bake", cat: "Available Today", price: 3.5, img: "https://images.pexels.com/photos/2067396/pexels-photo-2067396.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-  { id: "avail6", name: "Cinnamon Roll", sub: "Warm spice · Cream cheese glaze · Yeast dough", cat: "Available Today", price: 5, img: "https://images.pexels.com/photos/351961/pexels-photo-351961.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=400&w=400" },
-];
+type ShopItem = {
+  id: string;
+  name: string;
+  sub: string;
+  cat: string;
+  price: number;
+  img: string;
+  available: boolean;
+  sort_order: number;
+};
+
+const CATEGORIES = ["Fasting", "Kerestena", "Yeshemgelena", "Graduation", "Wedding", "Birthday", "Available Today"];
 
 type OrderRow = {
   id: string;
@@ -70,8 +48,11 @@ function AdminDashboard() {
   const [section, setSection] = useState<Section>("overview");
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
-  const [shopAvail, setShopAvail] = useState<Record<string, boolean>>({});
-  const [shopBusy, setShopBusy] = useState<Record<string, boolean>>({});
+  const [items, setItems] = useState<ShopItem[]>([]);
+  const [busy, setBusy] = useState<Record<string, boolean>>({});
+  const [filterCat, setFilterCat] = useState<string>("All");
+  const [filterAvail, setFilterAvail] = useState<"all" | "in" | "out">("all");
+  const [editing, setEditing] = useState<ShopItem | null>(null);
 
   const loadOrders = useCallback(async () => {
     const { data, error } = await supabase
@@ -82,27 +63,36 @@ function AdminDashboard() {
     setOrders((data ?? []) as OrderRow[]);
   }, []);
 
-  const loadShopAvail = useCallback(async () => {
+  const loadItems = useCallback(async () => {
     const { data, error } = await supabase
-      .from("shop_item_availability")
-      .select("item_id, available");
-    if (error) { console.error("Load shop avail failed", error); return; }
-    const map: Record<string, boolean> = {};
-    (data ?? []).forEach((r: any) => { map[r.item_id] = r.available; });
-    setShopAvail(map);
+      .from("shop_items" as any)
+      .select("id, name, sub, cat, price, img, available, sort_order")
+      .order("cat", { ascending: true })
+      .order("sort_order", { ascending: true });
+    if (error) { console.error("Load shop items failed", error); return; }
+    setItems(((data ?? []) as unknown) as ShopItem[]);
   }, []);
 
-  async function toggleShopItem(item_id: string, current: boolean) {
-    setShopBusy((b) => ({ ...b, [item_id]: true }));
-    setShopAvail((m) => ({ ...m, [item_id]: !current }));
+  async function toggleAvail(it: ShopItem) {
+    setBusy((b) => ({ ...b, [it.id]: true }));
+    setItems((arr) => arr.map((x) => x.id === it.id ? { ...x, available: !it.available } : x));
     const { error } = await supabase
-      .from("shop_item_availability")
-      .upsert({ item_id, available: !current, updated_at: new Date().toISOString() }, { onConflict: "item_id" });
+      .from("shop_items" as any)
+      .update({ available: !it.available })
+      .eq("id", it.id);
     if (error) {
       alert("Update failed: " + error.message);
-      setShopAvail((m) => ({ ...m, [item_id]: current }));
+      setItems((arr) => arr.map((x) => x.id === it.id ? { ...x, available: it.available } : x));
     }
-    setShopBusy((b) => ({ ...b, [item_id]: false }));
+    setBusy((b) => ({ ...b, [it.id]: false }));
+  }
+
+  async function deleteItem(it: ShopItem) {
+    if (!confirm(`Delete "${it.name}"? This cannot be undone.`)) return;
+    const prev = items;
+    setItems((arr) => arr.filter((x) => x.id !== it.id));
+    const { error } = await supabase.from("shop_items" as any).delete().eq("id", it.id);
+    if (error) { alert("Delete failed: " + error.message); setItems(prev); }
   }
 
   useEffect(() => {
@@ -114,22 +104,22 @@ function AdminDashboard() {
       const admin = !!roles?.some((r: any) => r.role === "admin");
       setIsAdmin(admin);
       setReady(true);
-      if (admin) { loadOrders(); loadShopAvail(); }
+      if (admin) { loadOrders(); loadItems(); }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) nav({ to: "/admin/login" });
     });
     return () => sub.subscription.unsubscribe();
-  }, [nav, loadOrders, loadShopAvail]);
+  }, [nav, loadOrders, loadItems]);
 
   useEffect(() => {
     if (!isAdmin) return;
     const ch = supabase
-      .channel("shop_avail_admin")
-      .on("postgres_changes", { event: "*", schema: "public", table: "shop_item_availability" }, () => loadShopAvail())
+      .channel("shop_items_admin")
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_items" }, () => loadItems())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [isAdmin, loadShopAvail]);
+  }, [isAdmin, loadItems]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -159,10 +149,17 @@ function AdminDashboard() {
     );
   }
 
-  const totalItems = SHOP_ITEMS.length;
-  const available = SHOP_ITEMS.filter((i) => shopAvail[i.id] !== false).length;
+  const totalItems = items.length;
+  const available = items.filter((i) => i.available).length;
   const soldOut = totalItems - available;
   const newOrders = orders.filter((o) => o.status === "new").length;
+
+  const filteredItems = items.filter((it) => {
+    if (filterCat !== "All" && it.cat !== filterCat) return false;
+    if (filterAvail === "in" && !it.available) return false;
+    if (filterAvail === "out" && it.available) return false;
+    return true;
+  });
 
   async function setOrderStatus(id: string, status: string) {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
@@ -342,11 +339,29 @@ function AdminDashboard() {
         {section === "menu" && (
           <>
             <h1 className="ma-page-title">Shop Items</h1>
-            <p className="ma-page-sub">All items from the shop page. Toggle availability — changes appear instantly for customers.</p>
+            <p className="ma-page-sub">Add, edit, upload photos, and toggle availability. Changes appear instantly on the shop.</p>
+
             <section className="ma-card">
-              <div className="ma-card-head">
-                <h2>Inventory ({SHOP_ITEMS.length})</h2>
-                <button className="ma-add-btn" type="button" onClick={loadShopAvail}>Refresh</button>
+              <div className="ma-card-head" style={{ flexWrap: "wrap", gap: 10 }}>
+                <h2>Inventory ({filteredItems.length}/{items.length})</h2>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
+                    className="ma-status-select" style={{ minWidth: 140 }}>
+                    <option value="All">All categories</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <select value={filterAvail} onChange={(e) => setFilterAvail(e.target.value as any)}
+                    className="ma-status-select" style={{ minWidth: 130 }}>
+                    <option value="all">All status</option>
+                    <option value="in">Available</option>
+                    <option value="out">Sold Out</option>
+                  </select>
+                  <button className="ma-add-btn" type="button" onClick={() => setEditing({
+                    id: "", name: "", sub: "", cat: CATEGORIES[0], price: 0, img: "", available: true, sort_order: 100,
+                  })}>
+                    <Plus size={16} style={{ marginRight: 4 }} /> New Item
+                  </button>
+                </div>
               </div>
               <div className="ma-table-wrap">
                 <table className="ma-table">
@@ -356,18 +371,18 @@ function AdminDashboard() {
                       <th>Category</th>
                       <th>Price</th>
                       <th>Status</th>
-                      <th>Action</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {SHOP_ITEMS.map((it) => {
-                      const on = shopAvail[it.id] !== false;
-                      const busy = !!shopBusy[it.id];
+                    {filteredItems.map((it) => {
+                      const on = it.available;
+                      const b = !!busy[it.id];
                       return (
                         <tr key={it.id}>
                           <td>
                             <div className="ma-cake-cell">
-                              <img className="ma-thumb" src={it.img} alt={it.name} loading="lazy" />
+                              <img className="ma-thumb" src={it.img || "https://via.placeholder.com/60?text=%3F"} alt={it.name} loading="lazy" />
                               <div>
                                 <div className="ma-cake-name">{it.name}</div>
                                 <div style={{ fontSize: 12, color: "#9a8b7c", maxWidth: 320 }}>{it.sub}</div>
@@ -377,33 +392,31 @@ function AdminDashboard() {
                           <td><span className="ma-cat-tag">{it.cat}</span></td>
                           <td><span className="ma-price">{fmtBirr(it.price)}</span></td>
                           <td>
-                            <span
-                              style={{
-                                display: "inline-block",
-                                fontSize: 11,
-                                fontWeight: 800,
-                                letterSpacing: ".06em",
-                                textTransform: "uppercase",
-                                padding: "4px 10px",
-                                borderRadius: 999,
-                                background: on ? "#dcfce7" : "#fee2e2",
-                                color: on ? "#047857" : "#b91c1c",
-                              }}
-                            >
+                            <span style={{
+                              display: "inline-block", fontSize: 11, fontWeight: 800, letterSpacing: ".06em",
+                              textTransform: "uppercase", padding: "4px 10px", borderRadius: 999,
+                              background: on ? "#dcfce7" : "#fee2e2", color: on ? "#047857" : "#b91c1c",
+                            }}>
                               {on ? "Available" : "Sold Out"}
                             </span>
                           </td>
                           <td>
-                            <div className="ma-stock">
+                            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                               <button
                                 type="button"
                                 className={"ma-switch" + (on ? " on" : "")}
                                 role="switch"
                                 aria-checked={on}
-                                disabled={busy}
+                                disabled={b}
                                 aria-label={`Toggle availability for ${it.name}`}
-                                onClick={() => toggleShopItem(it.id, on)}
+                                onClick={() => toggleAvail(it)}
                               />
+                              <button className="ma-add-btn" style={{ padding: "6px 10px" }} onClick={() => setEditing(it)} title="Edit">
+                                <Pencil size={14} />
+                              </button>
+                              <button className="ma-add-btn" style={{ padding: "6px 10px", background: "#fee2e2", color: "#b91c1c", borderColor: "#fecaca" }} onClick={() => deleteItem(it)} title="Delete">
+                                <Trash2 size={14} />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -416,6 +429,192 @@ function AdminDashboard() {
           </>
         )}
       </main>
+
+      {editing && (
+        <ItemEditor
+          initial={editing}
+          existingIds={items.map(i => i.id)}
+          onClose={() => setEditing(null)}
+          onSaved={() => { setEditing(null); loadItems(); }}
+        />
+      )}
     </div>
+  );
+}
+
+function ItemEditor({ initial, existingIds, onClose, onSaved }: {
+  initial: ShopItem;
+  existingIds: string[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const isNew = !initial.id;
+  const [form, setForm] = useState<ShopItem>(initial);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function update<K extends keyof ShopItem>(k: K, v: ShopItem[K]) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  async function uploadFile(file: File) {
+    setUploading(true);
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const baseId = form.id || `item-${Date.now()}`;
+      const path = `items/${baseId}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("cake-images").upload(path, file, {
+        upsert: true, contentType: file.type || "image/jpeg",
+      });
+      if (upErr) { alert("Upload failed: " + upErr.message); return; }
+      // Bucket is private — use a long-lived signed URL (10 years)
+      const { data, error: sErr } = await supabase.storage.from("cake-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (sErr || !data) { alert("Could not get image URL: " + (sErr?.message || "unknown")); return; }
+      update("img", data.signedUrl);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function save() {
+    if (!form.name.trim()) { alert("Name is required"); return; }
+    if (!form.cat) { alert("Category is required"); return; }
+    let id = form.id.trim();
+    if (isNew) {
+      if (!id) id = `itm-${Date.now()}`;
+      if (existingIds.includes(id)) { alert("ID already exists, pick another"); return; }
+    }
+    setSaving(true);
+    const payload = {
+      id, name: form.name.trim(), sub: form.sub, cat: form.cat,
+      price: Number(form.price) || 0, img: form.img,
+      available: !!form.available, sort_order: Number(form.sort_order) || 0,
+    };
+    const { error } = isNew
+      ? await supabase.from("shop_items" as any).insert(payload)
+      : await supabase.from("shop_items" as any).update(payload).eq("id", initial.id);
+    setSaving(false);
+    if (error) { alert("Save failed: " + error.message); return; }
+    onSaved();
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 500,
+        background: "rgba(46,21,3,.55)", backdropFilter: "blur(8px)",
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#FDF6EE", borderRadius: 22, width: "100%", maxWidth: 560,
+          maxHeight: "90dvh", overflow: "auto", boxShadow: "0 30px 80px rgba(0,0,0,.35)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid rgba(240,184,174,.4)" }}>
+          <h2 style={{ fontWeight: 800, color: "#2E1503", fontSize: "1.15rem", margin: 0 }}>
+            {isNew ? "New Shop Item" : "Edit Item"}
+          </h2>
+          <button onClick={onClose} aria-label="Close" style={{
+            width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
+            background: "#F9D9D3", display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        <div style={{ padding: 22, display: "grid", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 14, alignItems: "start" }}>
+            <div>
+              <div style={{
+                width: 120, height: 120, borderRadius: 16, overflow: "hidden",
+                background: "#F9D9D3", display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {form.img ? (
+                  <img src={form.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <span style={{ color: "#9a8b7c", fontSize: 12 }}>No image</span>
+                )}
+              </div>
+              <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f); e.target.value = ""; }} />
+              <button type="button" className="ma-add-btn" disabled={uploading}
+                onClick={() => fileRef.current?.click()}
+                style={{ marginTop: 8, width: 120, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <Upload size={14} /> {uploading ? "Uploading…" : "Upload"}
+              </button>
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              <Field label="Name">
+                <input value={form.name} onChange={(e) => update("name", e.target.value)} style={inp} />
+              </Field>
+              <Field label="Subtitle / description">
+                <input value={form.sub} onChange={(e) => update("sub", e.target.value)} style={inp} />
+              </Field>
+              <Field label="Image URL (or upload)">
+                <input value={form.img} onChange={(e) => update("img", e.target.value)} placeholder="https://..." style={inp} />
+              </Field>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+            <Field label="Category">
+              <select value={form.cat} onChange={(e) => update("cat", e.target.value)} style={inp}>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </Field>
+            <Field label="Price (Birr)">
+              <input type="number" min={0} step="0.01" value={form.price}
+                onChange={(e) => update("price", Number(e.target.value))} style={inp} />
+            </Field>
+            <Field label="Sort order">
+              <input type="number" value={form.sort_order}
+                onChange={(e) => update("sort_order", Number(e.target.value))} style={inp} />
+            </Field>
+          </div>
+
+          {isNew && (
+            <Field label="ID (optional — auto-generated if blank)">
+              <input value={form.id} onChange={(e) => update("id", e.target.value)} placeholder="e.g. bday5" style={inp} />
+            </Field>
+          )}
+
+          <label style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 600, color: "#2E1503" }}>
+            <input type="checkbox" checked={form.available}
+              onChange={(e) => update("available", e.target.checked)} />
+            Available on shop
+          </label>
+        </div>
+
+        <div style={{ padding: 18, borderTop: "1px solid rgba(240,184,174,.4)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button type="button" className="ma-add-btn" onClick={onClose}
+            style={{ background: "white", color: "#2E1503" }}>Cancel</button>
+          <button type="button" className="ma-add-btn" disabled={saving} onClick={save}>
+            {saving ? "Saving…" : (isNew ? "Create item" : "Save changes")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const inp: React.CSSProperties = {
+  width: "100%", padding: "10px 12px", borderRadius: 10,
+  border: "1.5px solid rgba(240,184,174,.55)", fontFamily: "inherit",
+  fontSize: ".88rem", outline: "none", background: "white", color: "#2E1503",
+};
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label style={{ display: "grid", gap: 4 }}>
+      <span style={{ fontSize: 12, fontWeight: 700, color: "#9a8b7c", letterSpacing: ".04em", textTransform: "uppercase" }}>{label}</span>
+      {children}
+    </label>
   );
 }

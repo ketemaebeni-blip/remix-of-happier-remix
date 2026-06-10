@@ -149,6 +149,45 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          available: boolean
+          cat: string
+          created_at: string
+          id: string
+          img: string
+          name: string
+          price: number
+          sort_order: number
+          sub: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          cat: string
+          created_at?: string
+          id: string
+          img?: string
+          name: string
+          price?: number
+          sort_order?: number
+          sub?: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          cat?: string
+          created_at?: string
+          id?: string
+          img?: string
+          name?: string
+          price?: number
+          sort_order?: number
+          sub?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
