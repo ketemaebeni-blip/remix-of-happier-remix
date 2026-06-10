@@ -678,10 +678,13 @@
     /* PRODUCT CARDS */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 28px 14px;
+      grid-template-columns: 1fr;
+      gap: 22px 16px;
       padding-top: 8px;
     }
+    @media (min-width: 520px) { .card-grid { grid-template-columns: repeat(2, 1fr); gap: 28px 16px; } }
+    @media (min-width: 900px) { .card-grid { grid-template-columns: repeat(3, 1fr); gap: 32px 20px; } }
+    @media (min-width: 1200px) { .card-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .product-card {
       background: var(--white);
