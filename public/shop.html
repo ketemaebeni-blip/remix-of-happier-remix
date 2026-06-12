@@ -583,23 +583,24 @@
       position: relative;
       z-index: 2;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .hero-bakery-name {
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(2.6rem, 11vw, 3.4rem);
-      color: var(--choc);
-      line-height: 1.1;
-      margin-bottom: 8px;
-      letter-spacing: -.01em;
+    .hero-logo {
+      display: block;
+      width: clamp(220px, 70vw, 460px);
+      height: auto;
+      max-width: 100%;
+      object-fit: contain;
+      margin: 0 auto 6px;
+      filter: drop-shadow(0 4px 14px rgba(46,21,3,.08));
+      user-select: none;
+      -webkit-user-drag: none;
     }
-
-    .hero-tagline {
-      font-size: .84rem;
-      color: rgba(46, 21, 3, .6);
-      font-weight: 500;
-      letter-spacing: .02em;
-    }
+    @media (min-width: 768px) { .hero-logo { width: clamp(320px, 50vw, 520px); } }
+    @media (min-width: 1024px) { .hero-logo { width: clamp(380px, 38vw, 580px); } }
 
     .hero-feature-pill {
       display: inline-flex;
@@ -1336,8 +1337,8 @@
         </div>
 
         <div class="hero-brand-section fade-up d2">
-          <h1 id="heroHeading" class="hero-bakery-name">Selam Cake Shop</h1>
-          <p class="hero-tagline">Handcrafted daily with love &amp; the finest ingredients</p>
+          <h1 id="heroHeading" class="sr-only">Selam Cakes — Cake Art</h1>
+          <img src="/assets/selam-logo.png" alt="Selam Cakes — Cake Art" class="hero-logo" />
           <div class="hero-feature-pill fade-up d3">
             <span class="live-dot"></span>
             Fresh baked today · 24 items available
@@ -2446,23 +2447,7 @@
         return;
       }
 
-      // Build a Telegram deep-link with the order pre-filled
-      const lines = [];
-      lines.push('🌸 Selam Cake & Arts — New Order');
-      lines.push('');
-      lines.push('👤 Name: ' + name);
-      lines.push('📞 Phone: ' + phone);
-      if (address) lines.push('📍 Address: ' + address);
-      lines.push('');
-      lines.push('🧁 Items:');
-      items.forEach(({ product, qty }) => {
-        lines.push('• ' + product.name + ' × ' + qty + ' — Birr ' + (product.price * qty).toFixed(2));
-      });
-      lines.push('');
-      lines.push('💰 Total: Birr ' + getTotal().toFixed(2));
-      const tgUrl = 'https://t.me/selamina22?text=' + encodeURIComponent(lines.join('\n'));
-
-      // Replace cart contents with a success panel + "Send to Telegram" button
+      // Order has been sent directly to Selam Cakes on Telegram by the server
       const content = document.getElementById('cartContent');
       const footer = document.getElementById('cartFooter');
       const customer = document.getElementById('cartCustomer');
@@ -2471,18 +2456,13 @@
       if (footer) footer.style.display = 'none';
       if (empty) empty.style.display = 'none';
       content.innerHTML = `
-        <div style="text-align:center;padding:24px 12px;">
+        <div style="text-align:center;padding:28px 16px;">
           <div style="width:72px;height:72px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
             <i data-lucide="check" style="width:36px;height:36px;color:#059669;stroke-width:2.5;"></i>
           </div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--choc);margin-bottom:6px;">Order placed!</div>
-          <div style="font-size:.82rem;color:var(--muted);margin-bottom:20px;">Tap below to notify us on Telegram so we can confirm.</div>
-          <a href="${tgUrl}" target="_blank" rel="noopener"
-             style="display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;background:linear-gradient(135deg,#229ED9,#1b88bf);color:white;text-decoration:none;border-radius:18px;padding:16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:700;box-shadow:0 5px 18px rgba(34,158,217,.35);">
-            <i data-lucide="send" style="width:18px;height:18px;stroke-width:2.2;"></i>
-            Send to Telegram
-          </a>
-          <button onclick="resetCartAfterOrder()" style="margin-top:12px;width:100%;background:transparent;color:var(--choc-mid);border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;padding:10px;">
+          <div style="font-size:1.15rem;font-weight:800;color:var(--choc);margin-bottom:6px;">Order placed!</div>
+          <div style="font-size:.85rem;color:var(--muted);margin-bottom:22px;line-height:1.45;">Your order has been sent to Selam Cakes. We'll reach out shortly to confirm.</div>
+          <button onclick="resetCartAfterOrder()" style="width:100%;background:linear-gradient(135deg,var(--choc),var(--choc-mid));color:white;border:none;cursor:pointer;font-family:inherit;border-radius:18px;padding:16px;font-size:.95rem;font-weight:700;box-shadow:0 5px 18px rgba(46,21,3,.25);">
             Done
           </button>
         </div>
