@@ -519,14 +519,8 @@
       background: linear-gradient(160deg, #F8C1CC 0%, #F5B4C1 40%, #F0A8B8 100%);
       position: relative;
       overflow: hidden;
-      padding:
-        max(28px, env(safe-area-inset-top))
-        max(20px, env(safe-area-inset-right))
-        48px
-        max(20px, env(safe-area-inset-left));
+      padding: 28px 20px 48px;
     }
-    @media (min-width: 768px) { .hero-wrap { padding-top: 40px; padding-bottom: 64px; } }
-    @media (min-width: 1024px) { .hero-wrap { padding-top: 56px; padding-bottom: 80px; } }
 
     .hero-search-row {
       display: flex;
@@ -588,18 +582,11 @@
     .hero-brand-section {
       position: relative;
       z-index: 2;
+      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      width: 100%;
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 12px 8px 4px;
     }
-    @media (min-width: 768px) { .hero-brand-section { padding: 20px 16px 8px; max-width: 860px; } }
-    @media (min-width: 1024px) { .hero-brand-section { padding: 28px 24px 12px; max-width: 1000px; } }
 
     .hero-logo {
       display: block;
@@ -612,8 +599,8 @@
       user-select: none;
       -webkit-user-drag: none;
     }
-    @media (min-width: 768px) { .hero-logo { width: clamp(320px, 50vw, 520px); margin-bottom: 10px; } }
-    @media (min-width: 1024px) { .hero-logo { width: clamp(380px, 38vw, 580px); margin-bottom: 14px; } }
+    @media (min-width: 768px) { .hero-logo { width: clamp(320px, 50vw, 520px); } }
+    @media (min-width: 1024px) { .hero-logo { width: clamp(380px, 38vw, 580px); } }
 
     .hero-feature-pill {
       display: inline-flex;
